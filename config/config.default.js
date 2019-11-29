@@ -18,6 +18,42 @@ module.exports = appInfo => {
   // add your middleware config here
   config.middleware = [];
 
+  // mysql
+  config.mysql = {
+    // database configuration
+    client: {
+      // host
+      host: 'localhost',
+      // port
+      port: '3306',
+      // username
+      user: 'root',
+      // password
+      password: 'wyh85375352',
+      // database
+      database: 'weather_station',    
+    },
+    // load into app, default is open
+    app: true,
+    // load into agent, default is close
+    agent: false,
+  };
+
+  // for dev
+  config.security = {
+    csrf: {
+      enable: false,
+    }
+  };
+
+  // view
+  config.view = {
+    mapping: {
+      '.ejs': 'ejs',
+      '.html': 'ejs'
+    }
+  };
+
   // add your user config here
   const userConfig = {
     // myAppName: 'egg',
