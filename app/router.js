@@ -6,6 +6,12 @@
 module.exports = app => {
   const { router, controller } = app;
   router.get('/', controller.home.index);
+
+  router.post('/api/register/block/list', controller.register.blockList);
+  router.post('/api/register/create', controller.register.register);
+
+  
+
   router.get('/product', controller.product.index);
   router.get('/product/detail', controller.product.detail);
   router.get('/product/detail/:id', controller.product.detail2);

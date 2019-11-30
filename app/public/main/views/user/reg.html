@@ -13,13 +13,24 @@
         <input type="text" name="email" id="LAY-user-login-cellphone" lay-verify="required" placeholder="Email Address"
           class="layui-input">
       </div>
-      <div class="layui-form-item">
-        <input type="text" name="firstname" id="LAY-user-login-nickname" lay-verify="nickname" placeholder="First Name"
-          class="layui-input">
+      <div class="layui-row layui-col-space5">
+        <div class="layui-col-xs6">
+          <div class="layui-form-item">
+            <input type="text" name="firstname" id="LAY-user-login-firstname" lay-verify="required"
+              placeholder="First Name" class="layui-input">
+          </div>
+        </div>
+        <div class="layui-col-xs6">
+          <div class="layui-form-item">
+            <input type="text" name="lastname" id="LAY-user-login-lastname" lay-verify="required"
+              placeholder="Last Name" class="layui-input">
+          </div>
+        </div>
       </div>
-      <div class="layui-form-item">
-        <input type="text" name="lasttname" id="LAY-user-login-nickname" lay-verify="nickname" placeholder="Last Name"
-          class="layui-input">
+      <div class="layui-form-item" style="padding-left: 20px;">
+        <input type="radio" name="gender" value="female" title="Female" checked="">
+        <input type="radio" name="gender" value="male" title="Male">
+        <input type="radio" name="gender" value="other" title="Other">
       </div>
       <div class="layui-form-item">
         <input type="password" name="pwd" id="LAY-user-login-password" lay-verify="required" placeholder="Password"
@@ -30,22 +41,17 @@
           placeholder="Confirm Password" class="layui-input">
       </div>
       <div class="layui-form-item">
-        <input type="radio" name="gender" value="male" title="Male">
-        <input type="radio" name="gender" value="female" title="Female">
-        <input type="radio" name="gender" value="other" title="Other">
+        <input list="blockList" type="text" name="addr" autocomplete="off" id="LAY-user-login-addr"
+          lay-verify="required" placeholder="Join a block" class="layui-input">
+        <datalist id="blockList">
+        </datalist>
       </div>
       <div class="layui-form-item">
-          <select name="addr" lay-verify="" lay-search>
-              <option value="">Join a block</option>
-              <script type="text/html" template lay-url="接口地址">
-                {{# for(){ }}
-                  <option value="021"></option>
-                {{# } }}
-              </script>
-            </select> 
+        <input type="text" name="intro" autocomplete="off" id="LAY-user-login-intro" lay-verify="required"
+          placeholder="Introduct yourself" class="layui-input">
       </div>
       <div class="layui-form-item">
-        <button class="layui-btn layui-btn-fluid" lay-submit lay-filter="LAY-user-reg-submit">Register</button>
+        <button class="layui-btn layui-btn-fluid" lay-submit lay-filter="LAY-user-reg-submit">CREATE ACCOUNT</button>
       </div>
     </div>
   </div>
@@ -53,12 +59,41 @@
 
 <script>
 
-  var input = $("#LAY-user-login-addr");
-  input.keyup(function () {
-    var curKeyword = input.val();
-    console.log('send: ' + curKeyword);
-  });
+  $("#LAY-user-login-addr").bind("keyup", function (event) {
+    if (event.keyCode == 38 || event.keyCode == 40) {
+      return false;
+    }
+    var value = $("#LAY-user-login-addr").val();
+    info(value);
+  })
 
+  function info(value) {
+    var url = "/api/register/block/list";
+    var data = {
+      name: value
+    }
+    $.ajax({
+      url: url,
+      data: data,
+      type: "POST",
+      dataType: "JSON",
+      success: function (result) {
+        var a = result.blockList;
+        var list = "";
+        for (var i in a) {
+          var l = a[i].bname + " - " + a[i].hname;
+          list += "<option>" + l + "</option>";
+        }
+        $("#blockList").html(list);
+      },
+      error: function () {
+        console.log("error");
+      }
+    })
+  }
+</script>
+
+<script>
   layui.use(['admin', 'form', 'user'], function () {
     var $ = layui.$
       , setter = layui.setter
@@ -68,26 +103,25 @@
 
     form.render();
 
-    //提交
     form.on('submit(LAY-user-reg-submit)', function (obj) {
       var field = obj.field;
 
-      //确认密码
       if (field.pwd !== field.repwd) {
         return layer.msg('Passwords entered do not match.');
       }
 
-      //请求接口
       admin.req({
-        url: '/' //实际使用请改成服务端真实接口
+        url: '/api/register/create'
+        , type: "POST"
+        , dataType: "JSON"
         , data: field
         , done: function (res) {
-          layer.msg('注册成功', {
+          layer.msg('Register Success!', {
             offset: '15px'
             , icon: 1
             , time: 1000
           }, function () {
-            location.hash = '/user/login'; //跳转到登入页
+            // location.hash = '/user/login';
           });
         }
       });

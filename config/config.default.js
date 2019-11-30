@@ -31,7 +31,7 @@ module.exports = appInfo => {
       // password
       password: 'wyh85375352',
       // database
-      database: 'weather_station',    
+      database: 'nextdoor',    
     },
     // load into app, default is open
     app: true,
