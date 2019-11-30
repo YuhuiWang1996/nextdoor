@@ -1,0 +1,98 @@
+<script type="text/html" template>
+  <link rel="stylesheet" href="{{ layui.setter.base }}style/login.css?v={{ layui.admin.v }}-1" media="all">
+</script>
+
+
+<div class="layadmin-user-login layadmin-user-display-show" id="LAY-user-login" style="display: none;">
+  <div class="layadmin-user-login-main">
+    <div class="layadmin-user-login-box layadmin-user-login-header">
+      <h2>Nextdoor</h2>
+    </div>
+    <div class="layadmin-user-login-box layadmin-user-login-body layui-form">
+      <div class="layui-form-item">
+        <input type="text" name="email" id="LAY-user-login-cellphone" lay-verify="required" placeholder="Email Address"
+          class="layui-input">
+      </div>
+      <div class="layui-form-item">
+        <input type="text" name="firstname" id="LAY-user-login-nickname" lay-verify="nickname" placeholder="First Name"
+          class="layui-input">
+      </div>
+      <div class="layui-form-item">
+        <input type="text" name="lasttname" id="LAY-user-login-nickname" lay-verify="nickname" placeholder="Last Name"
+          class="layui-input">
+      </div>
+      <div class="layui-form-item">
+        <input type="password" name="pwd" id="LAY-user-login-password" lay-verify="required" placeholder="Password"
+          class="layui-input">
+      </div>
+      <div class="layui-form-item">
+        <input type="password" name="repwd" id="LAY-user-login-repass" lay-verify="required"
+          placeholder="Confirm Password" class="layui-input">
+      </div>
+      <div class="layui-form-item">
+        <input type="radio" name="gender" value="male" title="Male">
+        <input type="radio" name="gender" value="female" title="Female">
+        <input type="radio" name="gender" value="other" title="Other">
+      </div>
+      <div class="layui-form-item">
+          <select name="addr" lay-verify="" lay-search>
+              <option value="">Join a block</option>
+              <script type="text/html" template lay-url="接口地址">
+                {{# for(){ }}
+                  <option value="021"></option>
+                {{# } }}
+              </script>
+            </select> 
+      </div>
+      <div class="layui-form-item">
+        <button class="layui-btn layui-btn-fluid" lay-submit lay-filter="LAY-user-reg-submit">Register</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+
+  var input = $("#LAY-user-login-addr");
+  input.keyup(function () {
+    var curKeyword = input.val();
+    console.log('send: ' + curKeyword);
+  });
+
+  layui.use(['admin', 'form', 'user'], function () {
+    var $ = layui.$
+      , setter = layui.setter
+      , admin = layui.admin
+      , form = layui.form
+      , router = layui.router();
+
+    form.render();
+
+    //提交
+    form.on('submit(LAY-user-reg-submit)', function (obj) {
+      var field = obj.field;
+
+      //确认密码
+      if (field.pwd !== field.repwd) {
+        return layer.msg('Passwords entered do not match.');
+      }
+
+      //请求接口
+      admin.req({
+        url: '/' //实际使用请改成服务端真实接口
+        , data: field
+        , done: function (res) {
+          layer.msg('注册成功', {
+            offset: '15px'
+            , icon: 1
+            , time: 1000
+          }, function () {
+            location.hash = '/user/login'; //跳转到登入页
+          });
+        }
+      });
+
+      return false;
+    });
+  });
+</script>

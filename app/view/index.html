@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>NextDoor</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <link rel="stylesheet" href="/public/layui/css/layui.css">
+    <link rel="stylesheet" href="/public/layui/icon/iconfont.css">
+    <style>
+        .icon_iconfont {
+            width: 1em;
+            height: 1em;
+            vertical-align: -0.15em;
+            fill: currentColor;
+            overflow: hidden;
+        }
+    </style>
+    <script>
+        /^http(s*):\/\//.test(location.href) || alert('请先部署到 localhost 下再访问');
+    </script>
+</head>
+
+<body>
+    <div id="LAY_app"></div>
+    <!-- <script src="layui/icon_new/iconfont.js"></script> -->
+    <script src="/public/layui/layui.js"></script>
+    <script src="/public/js/jquery-3.3.1.min.js"></script>
+
+    <!-- moment 时间处理 start -->
+    <!-- <script src="js/moment/moment.min.js"></script>
+    <script src="js/moment/moment-with-locales.min.js"></script>
+    <script src="js/moment/zh-cn.js"></script> -->
+    <!-- moment 时间处理 end -->
+
+    <script>
+        layui.config({
+            base: '/public/main/' //指定 layuiAdmin 项目路径，本地开发用 src，线上用 dist
+            , version: new Date().getTime()
+        }).use('index');
+
+    </script>
+
+</body>
+
+</html>

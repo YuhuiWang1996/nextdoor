@@ -1,0 +1,87 @@
+{
+  "code": 0,
+  "msg": "",
+  "data": [
+    {
+      "name": "home",
+      "title": "Home",
+      "icon": "layui-icon-home",
+      "list": [
+        {
+          "title": "Console",
+          "jump": "/"
+        }
+      ]
+    },
+    {
+      "name": "hood",
+      "title": "My Hood",
+      "icon": "layui-icon-component",
+      "list": [
+        {
+          "name": "message",
+          "title": "Message"
+        },
+        {
+          "name": "resident",
+          "title": "Resident"
+        }
+      ]
+    },
+    {
+      "name": "block",
+      "title": "My Block",
+      "icon": "layui-icon-component",
+      "list": [
+        {
+          "name": "message",
+          "title": "Message"
+        },
+        {
+          "name": "resident",
+          "title": "Resident"
+        }
+      ]
+    },
+    {
+      "name": "relation",
+      "title": "Relationships",
+      "icon": "layui-icon-component",
+      "list": [
+        {
+          "name": "friend",
+          "title": "Friends"
+        },
+        {
+          "name": "neighbor",
+          "title": "Neighbors"
+        }
+      ]
+    },
+    {
+      "name": "set",
+      "title": "Settings",
+      "icon": "layui-icon-set",
+      "list": [
+        {
+          "name": "subscribe",
+          "title": "Subscribe",
+          "list": [
+            {
+              "name": "topic",
+              "title": "Topic"
+            },
+            {
+              "name": "thread",
+              "title": "Thread"
+            }
+          ]
+        }, 
+        {
+          "name": "account",
+          "title": "My Account"
+        }
+      ]
+    }
+  ]
+}
