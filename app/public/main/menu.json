@@ -14,13 +14,28 @@
       ]
     },
     {
+      "name": "forum",
+      "title": "Forum",
+      "icon": "layui-icon-component",
+      "list": [
+        {
+          "name": "topic",
+          "title": "Topic"
+        },
+        {
+          "name": "Message",
+          "title": "Message"
+        }
+      ]
+    },
+    {
       "name": "hood",
       "title": "My Hood",
       "icon": "layui-icon-component",
       "list": [
         {
-          "name": "message",
-          "title": "Message"
+          "name": "news",
+          "title": "News"
         },
         {
           "name": "resident",
@@ -34,8 +49,8 @@
       "icon": "layui-icon-component",
       "list": [
         {
-          "name": "message",
-          "title": "Message"
+          "name": "news",
+          "title": "News"
         },
         {
           "name": "resident",

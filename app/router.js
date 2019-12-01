@@ -11,7 +11,11 @@ module.exports = app => {
   router.post('/api/register/create', controller.register.register);
   router.post('/api/login', controller.login.login);
 
-  router.get('/api/jwt/hood/resident/list', controller.hood.residentList);
+  router.get('/api/jwt/hood/resident/list', controller.hood.resident.residentList);
+  router.post('/api/jwt/hood/resident/friend/sendRequest', controller.hood.resident.sentFriendRequest);
+  router.post('/api/jwt/hood/resident/neighbor/add', controller.hood.resident.addNeighbor);
+  router.post('/api/jwt/hood/resident/friend/remove', controller.hood.resident.removeFriend);
+  router.post('/api/jwt/hood/resident/neighbor/remove', controller.hood.resident.removeNeighbor);
 
   // router.post('/api/jwt/');
 
