@@ -2,6 +2,8 @@
 
 'use strict';
 
+const secret = 'nextdoor';
+
 /**
  * @param {Egg.EggAppInfo} appInfo app info
  */
@@ -16,7 +18,12 @@ module.exports = appInfo => {
   config.keys = appInfo.name + '_1574974882358_4568';
 
   // add your middleware config here
-  config.middleware = [];
+  config.middleware = ['auz'];
+
+  config.auz = {
+    secret: secret,
+    match: '/api/jwt',
+  }
 
   // mysql
   config.mysql = {
@@ -31,12 +38,17 @@ module.exports = appInfo => {
       // password
       password: 'wyh85375352',
       // database
-      database: 'nextdoor',    
+      database: 'nextdoor',
     },
     // load into app, default is open
     app: true,
     // load into agent, default is close
     agent: false,
+  };
+
+  // jwt
+  config.jwt = {
+    secret: secret
   };
 
   // for dev

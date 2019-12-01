@@ -20,7 +20,7 @@ class UserService extends Service {
                     uintro: intro,
                     lastAccessAt: moment().format('YYYY-MM-DD HH:mm:ss')
                 });
-            
+
             const addrs = addr.split(' - ');
             const bname = addrs[0];
             const hname = addrs[1];
@@ -35,6 +35,22 @@ class UserService extends Service {
 
             return { success: true };
         }, ctx)
+    }
+
+    async login(email, pwd) {
+        const { ctx, app } = this;
+        const result = await app.mysql.select('User', { uemail: email, upwd: md5(pwd) });
+        if (result.length >= 1) {
+            return {
+                status: true,
+                uid: result[0].uid
+            }
+        } else {
+            return {
+                status: false,
+                msg: 'Invalid Email or Password.ß'
+            }
+        }
     }
 
 }
