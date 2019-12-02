@@ -1,0 +1,72 @@
+<title>Reply</title>
+
+<div class="layui-card layadmin-header">
+  <div class="layui-breadcrumb" lay-filter="breadcrumb">
+    <a><cite>Forum</cite></a>
+    <a lay-href="/forum/topic/">Topic</a>
+    <script type="text/html" template>
+          <a lay-href="/forum/message/detail/id={{ layui.router().search.id }}">Messages</a>
+        </script>
+    <a><cite>Reply</cite></a>
+  </div>
+</div>
+
+<div class="layui-fluid" id="LAY-forum-message-reply">
+  <div class="layui-row layui-col-space5">
+    <div class="layui-col-xs12 layui-col-sm12 layui-col-md12">
+      <div class="layui-card">
+        <div class="layui-card-body">
+          <div class="layui-form" id="LAY-forum-message-reply-tool-form" lay-filter="LAY-forum-message-reply-tool-form">
+            <div class="layui-form-item">
+              <label class="layui-form-label">Title</label>
+              <div class="layui-input-block">
+                <input type="text" name="mtitle" lay-verify="required" placeholder="" autocomplete="off"
+                  class="layui-input" value="">
+              </div>
+            </div>
+            <div class="layui-form-item">
+              <label class="layui-form-label">Content</label>
+              <div class="layui-input-block">
+                <textarea id="LAY-forum-message-reply-content" style="display: none;"></textarea>
+              </div>
+            </div>
+            <div class="layui-form-item">
+              <div class="layui-input-block">
+                <button class="layui-btn" lay-submit lay-filter="LAY-forum-message-reply-form-submit">submit
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  layui.use(['admin', 'table', 'util', 'form', 'upload', 'layedit'], function () {
+    var $ = layui.$
+      , admin = layui.admin
+      , form = layui.form;
+    var layedit = layui.layedit;
+    var index = layedit.build('LAY-forum-message-reply-content', {
+      tool: ['strong', 'italic', 'underline', 'del', '|', 'left', 'center', 'right']
+    });
+
+    form.on('submit(LAY-forum-message-reply-form-submit)', function (data) {
+      data.field.mbody = layedit.getContent(index);
+      data.field.thid = layui.router().search.id;
+      admin.req({
+        url: '/api/jwt/forum/message/reply'
+        , type: 'POST'
+        , data: data.field
+        , success: function (res) {
+          admin.events.refresh();
+          location.hash = '/forum/message/detail/id=' + layui.router().search.id;
+        }
+      });
+      return false;
+    });
+
+  });
+</script>

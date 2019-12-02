@@ -1,0 +1,85 @@
+<title>Topics</title>
+
+<div class="layui-card layadmin-header">
+    <div class="layui-breadcrumb" lay-filter="breadcrumb">
+        <a><cite>Forum</cite></a>
+        <a><cite>Topic</cite></a>
+    </div>
+</div>
+
+<div class="layui-fluid" id="LAY-forum-topic-list">
+    <div class="layui-card">
+        <table id="LAY-forum-topic-list-table" lay-filter="LAY-forum-topic-list-table"></table>
+    </div>
+    <div class="layui-card">
+        <div class="layui-card-body">
+            <script type="text/html" template>
+                <button class="layui-btn layui-btn-sm" lay-href="/forum/topic/new">
+                    <i class="layui-icon layui-icon-add-1"></i>Topic
+                </button>
+            </script>
+        </div>
+    </div>
+</div>
+
+<!--operation-->
+<script type="text/html" id="LAY-forum-topic-list-table-oper">
+    <a class="layui-btn layui-btn-xs" lay-event="more"><i
+        class="layui-icon layui-icon-more"></i>MORE</a>
+  </script>
+
+<script>
+    layui.use(['admin', 'table', 'util', 'form', 'laydate'], function () {
+        var $ = layui.$
+            , admin = layui.admin
+            , table = layui.table
+            , view = layui.view
+            , form = layui.form
+            , element = layui.element;
+        var laydate = layui.laydate;
+        var router = layui.router();
+
+        var tplName = function (d) {
+            return '<b style="font-size:16px;color:#050505;">' + d.tsubject + '</b>'
+                + '<span style="float:right;font-size:12px;color:rgb(120, 124, 126);">Created by ' + d.ufirstname + " " + d.ulastname + " " + moment(d.createAt).fromNow() + '</span>';
+        };
+
+        var tplMsg = function (d) {
+            if (d.mtitle) {
+                return '<i style="font-size:14px;color:#0079d3;">' + d.mtitle + '</i>'
+                    + '<span style="float:right;font-size:12px;color:rgb(120, 124, 126);">Posted by ' + d.msg_uf + " " + d.msg_ul + " " + moment(d.msg_createAt).fromNow() + '</span>';
+            } else {
+                return "";
+            }
+        };
+
+        let LAYForumTopicListTable = table.render({
+            elem: '#LAY-forum-topic-list-table'
+            , url: '/api/jwt/forum/topic/list'
+            // , toolbar: true
+            // , defaultToolbar: ['']
+            , cols: [[
+                { field: 'tsubject', title: 'SUBJECT', templet: tplName }
+                , { field: 'mtitle', title: 'Latest Message', templet: tplMsg }
+                , { title: '', width: 150, align: 'center', toolbar: '#LAY-forum-topic-list-table-oper' }
+            ]]
+            , limit: 10
+            , limits: [10, 15, 20, 25, 30]
+            , text: 'Ops...'
+            , where: {
+                access_token: layui.data('layuiAdmin').access_token
+            }
+            , page: getTablePageAndLimit('LAY-forum-topic-list-table')
+            , done: function (res, curr) {
+                setTablePageAndLimit(res, curr, LAYForumTopicListTable.config);
+            }
+        });
+
+        table.on('tool(LAY-forum-topic-list-table)', function (obj) {
+            var data = obj.data;
+            if (obj.event === 'more') {
+                location.hash = '/forum/topic/detail/id=' + data.tid;
+            }
+        });
+    });
+</script>

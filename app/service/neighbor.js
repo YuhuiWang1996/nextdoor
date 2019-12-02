@@ -29,6 +29,16 @@ class NeighborService extends Service {
             status: true
         }
     }
+
+    async getNeighborListByUid(uid) {
+        const {app} = this;
+        const neighborList = await app.mysql.query(
+            'SELECT U.* FROM Neighbor AS N LEFT JOIN `User` AS U on N.recipient_uid = U.uid\
+            WHERE applicant_uid = ?', [uid]
+        )
+        return neighborList;
+    }
+
 }
 
 module.exports = NeighborService;

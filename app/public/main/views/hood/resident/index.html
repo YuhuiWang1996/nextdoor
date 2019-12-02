@@ -57,7 +57,7 @@
             return d.ufirstname + " " + d.ulastname;
         };
 
-        let LAYAdminAdminListTable = table.render({
+        let LAYHoodResidentListTable = table.render({
             elem: '#LAY-hood-resident-list-table'
             , url: '/api/jwt/hood/resident/list'
             // , toolbar: true
@@ -75,7 +75,7 @@
             }
             , page: getTablePageAndLimit('LAY-hood-resident-list-table')
             , done: function (res, curr) {
-                setTablePageAndLimit(res, curr, LAYAdminAdminListTable.config);
+                setTablePageAndLimit(res, curr, LAYHoodResidentListTable.config);
 
             }
         });

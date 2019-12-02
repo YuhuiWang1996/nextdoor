@@ -48,6 +48,19 @@ class FriendService extends Service {
         }
     }
 
+    async getFriendListByUid(uid) {
+
+        const { app } = this;
+
+        const friendList = await app.mysql.query(
+            'SELECT * FROM `User` AS U\
+            NATURAL JOIN (( SELECT F1.recipient_uid AS uid FROM Friend AS F1 WHERE F1.`status` = 1001 AND F1.applicant_uid = ? ) UNION\
+            ( SELECT F2.applicant_uid AS uid FROM Friend AS F2 WHERE F2.`status` = 1001 AND F2.recipient_uid = ? )) AS T', [uid, uid]);
+
+        return friendList;
+
+    }
+
 }
 
 module.exports = FriendService;
