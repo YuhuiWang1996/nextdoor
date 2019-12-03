@@ -60,7 +60,7 @@
             // , defaultToolbar: ['']
             , cols: [[
                 { field: 'tsubject', title: 'SUBJECT', templet: tplName }
-                , { field: 'mtitle', title: 'Latest Message', templet: tplMsg }
+                , { field: 'mtitle', width: 500, title: 'Latest Message', templet: tplMsg }
                 , { title: '', width: 150, align: 'center', toolbar: '#LAY-forum-topic-list-table-oper' }
             ]]
             , limit: 10
@@ -78,7 +78,7 @@
         table.on('tool(LAY-forum-topic-list-table)', function (obj) {
             var data = obj.data;
             if (obj.event === 'more') {
-                location.hash = '/forum/topic/detail/id=' + data.tid;
+                location.hash = '/forum/topic/thread/id=' + data.tid;
             }
         });
     });

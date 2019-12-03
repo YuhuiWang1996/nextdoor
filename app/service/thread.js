@@ -1,9 +1,10 @@
 'use strict';
 
 const Service = require('egg').Service;
+const moment = require('moment');
 
 class ThreadService extends Service {
-    
+
     async getUnreadThreadListByUid(uid) {
 
         const { app } = this;
@@ -24,6 +25,44 @@ class ThreadService extends Service {
         WHERE readAt IS NULL OR latestCreateAt > readAt', [uid, uid]);
 
         return threadList;
+
+    }
+
+    async create(uid, tid, mtitle, mbody, receiver_uids) {
+
+        const { app, ctx } = this;
+
+        const result = await app.mysql.beginTransactionScope(async conn => {
+
+            const thread = await conn.insert('Thread', {
+                tid: tid
+            });
+
+            const message = await conn.insert('Message', {
+                thid: thread.insertId,
+                uid: uid,
+                mtitle: mtitle,
+                mbody: mbody,
+                createAt: moment().format('YYYY-MM-DD HH:mm:ss')
+            });
+
+            for (let receiver_uid of receiver_uids) {
+                await conn.insert('PermissionThread', {
+                    thid: thread.insertId,
+                    uid: receiver_uid
+                })
+            }
+
+            await conn.insert('PermissionThread', {
+                thid: thread.insertId,
+                uid: uid
+            })
+
+            ctx.thid = thread.insertId;
+
+            return { success: true };
+
+        }, ctx);
 
     }
 

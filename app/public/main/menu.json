@@ -53,6 +53,10 @@
           "title": "News"
         },
         {
+          "name": "newResident",
+          "title": "New Resident"
+        },
+        {
           "name": "resident",
           "title": "Resident"
         }

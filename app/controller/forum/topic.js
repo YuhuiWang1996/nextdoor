@@ -24,7 +24,10 @@ class TopicController extends Controller {
         const body = ctx.request.body;
         const result = await ctx.service.topic.newTopic(ctx.uid, body.tsubject, body.recipient_uid, body.is_block, body.is_hood, body.is_friends, body.mtitle, body.mbody);
         ctx.body = {
-            "code": 0
+            "code": 0,
+            "data": {
+                thid: ctx.thid
+            }
         };
         ctx.status = 200;
     }
@@ -64,6 +67,20 @@ class TopicController extends Controller {
             "data": friendAndNeighborList,
         }
         ctx.status = 200;
+    }
+
+    async receiverList() {
+        const { ctx } = this;
+        const receiverList = await ctx.service.topic.getReceiverListByTid(ctx.query.tid, ctx.uid);
+
+        ctx.body = {
+            "code": 0,
+            "data": {
+                receiverList: receiverList
+            }
+        }
+        ctx.status = 200;
+
     }
 
 }

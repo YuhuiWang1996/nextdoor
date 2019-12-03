@@ -17,22 +17,22 @@
 <!--operation-->
 <script type="text/html" id="LAY-hood-resident-list-table-oper">
     {{# if (d.is_friend == 0){ }}
-        {{# if (d.friendStatus == 1001) { }}
-            <a class="layui-btn layui-btn-xs" lay-event="removeFriend"><i
-                class="layui-icon layui-icon-ok"></i>Friend</a>
-        {{# } }}
-        {{# if (d.friendStatus == 1002) { }}
-            <a class="layui-btn layui-btn-xs layui-btn-warm"><i
-                class="layui-icon layui-icon-loading"></i>Friend Request Sent</a>
-        {{# } }}
-        {{# if (d.friendStatus == 1003 || d.friendStatus == 1004 ) { }}
-        <a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="friend"><i
-            class="layui-icon layui-icon-add-1"></i>Friend</a>
-        {{# } }}
+        <a class="layui-btn layui-btn-xs" lay-event="removeFriend"><i
+            class="layui-icon layui-icon-ok"></i>Friend</a>
     {{# } else { }}
-        <a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="friend"><i
+        {{# if (d.is_friend_recipient == 1 && d.is_friend_applicant == 1){ }}
+            <a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="friend"><i
             class="layui-icon layui-icon-add-1"></i>Friend</a>
+        {{# } else if (d.is_friend_recipient == 1) { }}
+        <a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="friend"><i
+            class="layui-icon layui-icon-face-smile-b"></i>Accept</a>
+        {{# } else if (d.is_friend_applicant == 1) { }}
+        <a class="layui-btn layui-btn-xs layui-btn-warm"><i
+            class="layui-icon layui-icon-loading"></i>Friend Request Sent</a>
+        {{# } }}
     {{# } }}
+    
+
     {{# if (d.is_neighbor == 1){ }}
       <a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="neighbor"><i
         class="layui-icon layui-icon-add-1"></i>Neighbor</a>
@@ -90,7 +90,6 @@
                         uid: data.uid,
                     }
                     , success: function (res) {
-                        layer.msg("Friend Request is sent.");
                         table.reload('LAY-hood-resident-list-table');
                     }
                 });

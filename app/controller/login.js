@@ -12,7 +12,7 @@ class LoginController extends Controller {
                 data: {
                     access_token: app.jwt.sign({
                         uid: result.uid
-                    }, app.config.jwt.secret, { expiresIn: '10h' })
+                    }, app.config.jwt.secret, { expiresIn: '100h' })
                 }
             }
             ctx.status = 200;
@@ -21,7 +21,7 @@ class LoginController extends Controller {
                 code: 4010,
                 msg: result.msg
             }
-            ctx.status = 401;
+            ctx.status = 200;
         }
     }
 }

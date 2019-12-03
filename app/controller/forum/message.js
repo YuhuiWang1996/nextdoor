@@ -44,8 +44,8 @@ class MessageController extends Controller {
 
     async reply() {
 
-        const {ctx} = this;
-        let result = await ctx.service.message.replyMessage(ctx.request.body.thid, ctx.uid, ctx.request.body.mtitle, ctx.request.body.mbody);
+        const { ctx } = this;
+        const result = await ctx.service.message.replyMessage(ctx.request.body.thid, ctx.uid, ctx.request.body.mtitle, ctx.request.body.mbody);
 
         ctx.body = {
             "code": 0
@@ -53,6 +53,21 @@ class MessageController extends Controller {
         ctx.status = 200;
 
     }
+
+    async new() {
+        const { ctx } = this;
+        const result = await ctx.service.thread.create(ctx.uid, ctx.request.body.tid, ctx.request.body.mtitle, ctx.request.body.mbody, ctx.request.body.receiver_uids);
+
+        ctx.body = {
+            "code": 0,
+            "data": {
+                thid: ctx.thid
+            }
+        }
+        ctx.status = 200;
+
+    }
+
 }
 
 module.exports = MessageController;

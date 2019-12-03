@@ -19,9 +19,9 @@ module.exports = options => {
                 const { uid, iat, exp } = jwt.verify(access_token, secret);
                 ctx.uid = uid;
             } catch (err) {
-                ctx.status = 401;
+                ctx.status = 200;
                 return ctx.body = {
-                    code: 4010,
+                    code: 1001,
                     msg: 'Please sign in again.',
                     data: {
                         redirect: url

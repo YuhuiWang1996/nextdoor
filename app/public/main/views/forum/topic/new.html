@@ -100,7 +100,7 @@
                 }
                 , success: function (res) {
                     admin.events.refresh();
-                    location.hash = '/forum/message/detail/id=' + layui.router().search.id;
+                    location.hash = '/forum/topic/thread/id=' + res.data.thid;
                 }
             });
             return false;

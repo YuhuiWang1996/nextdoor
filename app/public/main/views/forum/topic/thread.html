@@ -31,6 +31,15 @@
     <div class="layui-card">
         <table id="LAY-forum-topic-thread-list-table" lay-filter="LAY-forum-topic-thread-list-table"></table>
     </div>
+    <div class="layui-card">
+        <div class="layui-card-body">
+            <script type="text/html" template>
+                <button class="layui-btn layui-btn-sm" lay-href="/forum/topic/new_thread/id={{layui.router().search.id}}">
+                    <i class="layui-icon layui-icon-add-1"></i>Message
+                </button>
+            </script>
+        </div>
+    </div>
 </div>
 
 <!--operation-->
