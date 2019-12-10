@@ -29,15 +29,13 @@ class ThreadService extends Service {
     }
 
     async create(uid, tid, mtitle, mbody, receiver_uids) {
-
         const { app, ctx } = this;
-
         const result = await app.mysql.beginTransactionScope(async conn => {
-
+            // create a thread
             const thread = await conn.insert('Thread', {
                 tid: tid
             });
-
+            // create an initial message that belongs to this thread
             const message = await conn.insert('Message', {
                 thid: thread.insertId,
                 uid: uid,
@@ -45,25 +43,21 @@ class ThreadService extends Service {
                 mbody: mbody,
                 createAt: moment().format('YYYY-MM-DD HH:mm:ss')
             });
-
+            // create who can read and reply messages in this thread
             for (let receiver_uid of receiver_uids) {
                 await conn.insert('PermissionThread', {
                     thid: thread.insertId,
                     uid: receiver_uid
                 })
             }
-
+            // author can also read and reply
             await conn.insert('PermissionThread', {
                 thid: thread.insertId,
                 uid: uid
             })
-
             ctx.thid = thread.insertId;
-
             return { success: true };
-
         }, ctx);
-
     }
 
 }

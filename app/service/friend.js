@@ -5,13 +5,12 @@ const Service = require('egg').Service;
 class FriendService extends Service {
     async friendRequest(applicant_uid, recipient_uid) {
         const { app } = this;
-
+        // Friendship is set when both sent a friend request.
         await app.mysql.insert('Friend',
             {
                 applicant_uid: applicant_uid,
                 recipient_uid: recipient_uid
             });
-
         return {
             status: true
         }
@@ -19,7 +18,6 @@ class FriendService extends Service {
 
     async removeFriend(applicant_uid, recipient_uid) {
         const { app } = this;
-
         await app.mysql.delete('Friend',
             {
                 applicant_uid: applicant_uid,
@@ -30,7 +28,6 @@ class FriendService extends Service {
                 applicant_uid: recipient_uid,
                 recipient_uid: applicant_uid
             });
-
         return {
             status: true
         }

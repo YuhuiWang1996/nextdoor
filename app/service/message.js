@@ -39,20 +39,18 @@ class MessageService extends Service {
   }
 
   async replyMessage(thid, uid, mtitle, mbody) {
-
     const { app } = this;
-    const result = await app.mysql.insert('message', {
+    // create a new message in this thread
+    await app.mysql.insert('message', {
       thid: thid,
       uid: uid,
       mtitle: mtitle,
       mbody: mbody,
       createAt: moment().format('YYYY-MM-DD HH:mm:ss')
     });
-
     return {
       status: true
     }
-
   }
 }
 

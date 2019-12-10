@@ -178,7 +178,7 @@ class TopicService extends Service {
       uidList.add(topic.recipient_uid);
     }
     if (topic.recipient_bid) {
-      const users = app.mysql.select('BlockJoin', {
+      const users = await app.mysql.select('BlockJoin', {
         status: 1001,
         bid: topic.recipient_bid
       });
