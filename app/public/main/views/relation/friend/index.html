@@ -1,0 +1,139 @@
+<title>Topics</title>
+
+<div class="layui-card layadmin-header">
+    <div class="layui-breadcrumb" lay-filter="breadcrumb">
+        <a><cite>Relationships</cite></a>
+        <a><cite>Friends</cite></a>
+    </div>
+</div>
+
+<div class="layui-fluid" id="LAY-relation-friend-list">
+    <div class="layui-row layui-col-space5">
+        <div class="layui-col-xs12 layui-col-sm12 layui-col-md12 layui-col-lg12">
+            <div class="layui-card">
+                <div class="layui-card-body">
+                    <table id="LAY-relation-friend-list-table" lay-filter="LAY-relation-friend-list-table"></table>
+                </div>
+            </div>
+        </div>
+        <div class="layui-col-xs12 layui-col-sm12 layui-col-md6 layui-col-lg6">
+            <div class="layui-card">
+                <div class="layui-card-header">
+                    Friend Requests
+                </div>
+                <div class="layui-card-body">
+                    <table id="LAY-relation-friend-receive-list-table"
+                        lay-filter="LAY-relation-friend-receive-list-table"></table>
+                </div>
+            </div>
+        </div>
+        <div class="layui-col-xs12 layui-col-sm12 layui-col-md6 layui-col-lg6">
+            <div class="layui-card">
+                <div class="layui-card-header">
+                    Request Sent
+                </div>
+                <div class="layui-card-body">
+                    <table id="LAY-relation-friend-sent-list-table" lay-filter="LAY-relation-friend-sent-list-table">
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--operation-->
+<script type="text/html" id="LAY-relation-friend-list-table-oper">
+    <a class="layui-btn layui-btn-warm layui-btn-xs" lay-event="more"><i
+        class="layui-icon layui-icon-close"></i>remove</a>
+</script>
+
+<script type="text/html" id="LAY-relation-friend-receive-list-table-oper">
+    <a class="layui-btn layui-btn-xs" lay-event="more"><i
+        class="layui-icon layui-icon-close"></i>accept</a>
+</script>
+
+<script type="text/html" id="LAY-relation-friend-sent-list-table-oper">
+    <a class="layui-btn layui-btn-warm layui-btn-xs" lay-event="more"><i
+        class="layui-icon layui-icon-close"></i>cancel</a>
+</script>
+
+<script>
+    layui.use(['admin', 'table', 'util', 'form', 'laydate'], function () {
+        var $ = layui.$
+            , admin = layui.admin
+            , table = layui.table
+            , view = layui.view
+            , form = layui.form
+            , element = layui.element;
+        var laydate = layui.laydate;
+        var router = layui.router();
+
+        var tplName = function (d) {
+            return d.ufirstname + " " + d.ulastname;
+        };
+
+        let LAYRelationFriendListTable = table.render({
+            elem: '#LAY-relation-friend-list-table'
+            , url: '/api/jwt/relation/friend/list'
+            , cols: [[
+                { field: 'uname', title: 'Name', templet: tplName }
+                , { title: '', width: 150, align: 'center', toolbar: '#LAY-relation-friend-list-table-oper' }
+            ]]
+            , limit: 10
+            , limits: [10, 15, 20, 25, 30]
+            , text: 'Ops...'
+            , where: {
+                access_token: layui.data('layuiAdmin').access_token
+            }
+            , page: getTablePageAndLimit('LAY-relation-friend-list-table')
+            , done: function (res, curr) {
+                setTablePageAndLimit(res, curr, LAYRelationFriendListTable.config);
+            }
+        });
+
+        let LAYRelationFriendReceiveListTable = table.render({
+            elem: '#LAY-relation-friend-receive-list-table'
+            , url: '/api/jwt/relation/friend/receive/list'
+            , cols: [[
+                { field: 'uname', title: 'Name', templet: tplName }
+                , { title: '', width: 150, align: 'center', toolbar: '#LAY-relation-friend-receive-list-table-oper' }
+            ]]
+            , limit: 10
+            , limits: [10, 15, 20, 25, 30]
+            , text: 'Ops...'
+            , where: {
+                access_token: layui.data('layuiAdmin').access_token
+            }
+            , page: getTablePageAndLimit('LAY-relation-friend-receive-list-table')
+            , done: function (res, curr) {
+                setTablePageAndLimit(res, curr, LAYRelationFriendReceiveListTable.config);
+            }
+        });
+
+        let LAYRelationFriendSentListTable = table.render({
+            elem: '#LAY-relation-friend-sent-list-table'
+            , url: '/api/jwt/relation/friend/sent/list'
+            , cols: [[
+                { field: 'uname', title: 'Name', templet: tplName }
+                , { title: '', width: 150, align: 'center', toolbar: '#LAY-relation-friend-sent-list-table-oper' }
+            ]]
+            , limit: 10
+            , limits: [10, 15, 20, 25, 30]
+            , text: 'Ops...'
+            , where: {
+                access_token: layui.data('layuiAdmin').access_token
+            }
+            , page: getTablePageAndLimit('LAY-relation-friend-sent-list-table')
+            , done: function (res, curr) {
+                setTablePageAndLimit(res, curr, LAYRelationFriendSentListTable.config);
+            }
+        });
+
+        table.on('tool(LAY-relation-friend-list-table)', function (obj) {
+            var data = obj.data;
+            if (obj.event === 'more') {
+                location.hash = '/forum/topic/detail/id=' + data.tid;
+            }
+        });
+    });
+</script>

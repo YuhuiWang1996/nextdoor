@@ -5,9 +5,9 @@
     <a><cite>Forum</cite></a>
     <a lay-href="/forum/topic/">Topic</a>
     <script type="text/html" template>
-          <a lay-href="/forum/message/detail/id={{ layui.router().search.id }}">Messages</a>
-        </script>
-    <a><cite>Reply</cite></a>
+      <a lay-href="/forum/message/detail/id={{ layui.router().search.id }}">Reply</a>
+    </script>
+    <a><cite>New</cite></a>
   </div>
 </div>
 
@@ -61,8 +61,7 @@
         , type: 'POST'
         , data: data.field
         , success: function (res) {
-          admin.events.refresh();
-          location.hash = '/forum/message/detail/id=' + layui.router().search.id;
+          location.hash = '/forum/thread/detail/id=' + layui.router().search.id;
         }
       });
       return false;

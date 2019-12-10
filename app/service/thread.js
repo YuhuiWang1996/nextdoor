@@ -12,7 +12,7 @@ class ThreadService extends Service {
         const threadList = app.mysql.query(
             'SELECT\
             ThreadLatestMsg.thid, ReadThread.readAt, ThreadLatestMsg.latestCreateAt,\
-            M1.mid AS latestMid, M1.mtitle AS latestMtitle, M2.mid AS initialMid, M2.mtitle AS initialMtitle,\
+            M1.mid AS latestMid, M1.mtitle AS latestMtitle, M1.mbody AS latestMbody, M2.mid AS initialMid, M2.mtitle AS initialMtitle, M2.mbody AS initialMbody,\
             T.tid, T.tsubject \
         FROM\
             ( SELECT PermissionThread.thid, MAX( createAt ) AS latestCreateAt, min( createAt ) AS initialCreateAt FROM\

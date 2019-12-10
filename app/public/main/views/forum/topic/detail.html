@@ -1,0 +1,108 @@
+<style type="text/css">
+    #LAY-forum-topic-thread-list .layui-table-cell {
+        height: auto;
+        overflow: visible;
+        text-overflow: inherit;
+        white-space: normal;
+    }
+
+    #LAY-forum-topic-thread-list hr {
+        margin: 5px 0;
+    }
+</style>
+
+<title>Topics</title>
+
+<div class="layui-card layadmin-header">
+    <div class="layui-breadcrumb" lay-filter="breadcrumb">
+        <a><cite>Forum</cite></a>
+        <a lay-href="/forum/topic/">Topics</a>
+        <a><cite>Threads</cite></a>
+    </div>
+</div>
+
+<script type="text/html" template lay-url="/api/jwt/forum/topic/detail?tid={{ layui.router().search.id }}">
+    <blockquote class="layui-elem-quote" style = "margin: 20px;margin-bottom:0px;background-color:#fff;"><b style="font-size:18px;">{{ d.data.tsubject }}</b>
+        <span style="float:right;">created {{ moment(d.data.createAt).fromNow() }}</span>
+    </blockquote>
+</script>
+
+<div class="layui-fluid" id="LAY-forum-topic-thread-list">
+    <div class="layui-card">
+        <table id="LAY-forum-topic-thread-list-table" lay-filter="LAY-forum-topic-thread-list-table"></table>
+    </div>
+    <div class="layui-card">
+        <div class="layui-card-body">
+            <script type="text/html" template>
+                <button class="layui-btn layui-btn-sm" lay-href="/forum/thread/new/id={{layui.router().search.id}}">
+                    <i class="layui-icon layui-icon-add-1"></i>Message
+                </button>
+            </script>
+        </div>
+    </div>
+</div>
+
+<!--operation-->
+<script type="text/html" id="LAY-forum-topic-thread-list-table-oper">
+    <a class="layui-btn layui-btn-xs" lay-event="more"><i
+        class="layui-icon layui-icon-more"></i>MORE</a>
+  </script>
+
+<script>
+    layui.use(['admin', 'table', 'util', 'form', 'laydate'], function () {
+        var $ = layui.$
+            , admin = layui.admin
+            , table = layui.table
+            , view = layui.view
+            , form = layui.form
+            , element = layui.element;
+        var laydate = layui.laydate;
+        var router = layui.router();
+
+        var tplName = function (d) {
+            return '<b style="font-size:16px;color:#050505;">' + d.initialMtitle + '</b>'
+                + '<span style="float:right;font-size:12px;color:rgb(120, 124, 126);">Posted by ' + d.ufirstname + " " + d.ulastname + " " + moment(d.initialCreateAt).fromNow() + '</span>'
+                + '<hr style="width:50%;"><span style="font-size:12px;">' + d.initialMbody + '</span>'
+        };
+
+        var tplMsg = function (d) {
+            if (d.initialCreateAt != d.latestCreateAt && d.latestMtitle) {
+                return '<i style="font-size:14px;color:#0079d3;">' + d.latestMtitle + '</i>'
+                    + '<span style="float:right;font-size:12px;color:rgb(120, 124, 126);">Posted ' + d.u2fn + " " + d.u2ln + " " + moment(d.latestCreateAt).fromNow() + '</span>'
+                    + '<hr style="width:30%;"><span style="font-size:12px;">' + d.latestMbody + '</span>';
+            } else {
+                return "No Reply";
+            }
+        };
+
+        let LAYForumTopicListTable = table.render({
+            elem: '#LAY-forum-topic-thread-list-table'
+            , url: '/api/jwt/forum/topic/thread'
+            // , toolbar: true
+            // , defaultToolbar: ['']
+            , cols: [[
+                { field: 'initialMtitle', title: 'Initial Message', templet: tplName }
+                , { field: 'latestMtitle', width: 400, title: 'Latest Reply', templet: tplMsg }
+                , { title: '', width: 150, align: 'center', toolbar: '#LAY-forum-topic-thread-list-table-oper' }
+            ]]
+            , limit: 10
+            , limits: [10, 15, 20, 25, 30]
+            , text: 'Ops...'
+            , where: {
+                tid: router.search.id,
+                access_token: layui.data('layuiAdmin').access_token
+            }
+            , page: getTablePageAndLimit('LAY-forum-topic-thread-list-table')
+            , done: function (res, curr) {
+                setTablePageAndLimit(res, curr, LAYForumTopicListTable.config);
+            }
+        });
+
+        table.on('tool(LAY-forum-topic-thread-list-table)', function (obj) {
+            var data = obj.data;
+            if (obj.event === 'more') {
+                location.hash = '/forum/thread/detail/id=' + data.thid;
+            }
+        });
+    });
+</script>

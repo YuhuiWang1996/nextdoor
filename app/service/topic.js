@@ -4,10 +4,11 @@ const Service = require('egg').Service;
 const moment = require('moment');
 
 class TopicService extends Service {
-  async getTopicListByUid(uid) {
+  async getTopicListByUid(uid, limit, page) {
 
     const { app } = this;
 
+    // escape
     const topicList = await app.mysql.query(
       'SELECT * FROM topic\
       LEFT JOIN (SELECT bid, bname, hid, hname FROM Hood NATURAL JOIN Block NATURAL JOIN BlockJoin AS BJ WHERE BJ.uid = ? AND BJ.`status` = 1001 ) AS HB ON topic.recipient_bid = HB.bid OR topic.recipient_hid = HB.hid\
@@ -19,7 +20,8 @@ class TopicService extends Service {
       ( SELECT tid, max( M.createAt ) AS latestCreateAt FROM thread AS T NATURAL JOIN message AS M JOIN PermissionThread AS PT ON PT.thid = T.thid AND PT.uid = ? GROUP BY tid \
       ) AS TM ON TM.latestCreateAt = Message.createAt ) as M on M.ttid = topic.tid \
       LEFT JOIN `User` ON Topic.uid = `User`.uid\
-      WHERE bid IS NOT NULL OR hid IS NOT NULL OR myUid IS NOT NULL OR myTopicUid IS NOT NULL OR friend_uid IS NOT NULL', [uid, uid, uid, uid, uid, uid])
+      WHERE bid IS NOT NULL OR hid IS NOT NULL OR myUid IS NOT NULL OR myTopicUid IS NOT NULL OR friend_uid IS NOT NULL', [uid, uid, uid, uid, uid, uid]);
+
 
     return topicList;
 
@@ -160,6 +162,7 @@ class TopicService extends Service {
       })
 
       ctx.thid = thid;
+      ctx.tid = topic.insertId;
 
       return { success: true };
 

@@ -12,6 +12,9 @@
     <div class="layui-card">
         <div class="layui-card-body">
             <div class="layui-form" id="LAY-forum-topic-new-form" lay-filter="LAY-forum-topic-new-form">
+                <fieldset class="layui-elem-field layui-field-title">
+                    <legend>Topic</legend>
+                </fieldset>
                 <div class="layui-form-item">
                     <label class="layui-form-label">Subject</label>
                     <div class="layui-input-block">
@@ -40,6 +43,9 @@
                         </div>
                     </script>
                 </div>
+                <fieldset class="layui-elem-field layui-field-title">
+                    <legend>Initial Message</legend>
+                </fieldset>
                 <div class="layui-form-item">
                     <label class="layui-form-label">Title</label>
                     <div class="layui-input-block">
@@ -84,12 +90,11 @@
         });
         // id, tsubject, recipient_uid, is_block, is_hood, is_friends, mtitle, mbody
         form.on('submit(LAY-forum-topic-new-form-submit)', function (data) {
-            console.log(data.field);
             const field = data.field;
             admin.req({
                 url: '/api/jwt/forum/topic/new/submit'
                 , type: 'POST'
-                , data: {
+                , data: { 
                     tsubject: field.tsubject,
                     recipient_uid: field.recipient_uid == "" ? 0 : field.recipient_uid,
                     is_block: field.recipient_isBlock ? 1 : 0,
@@ -99,8 +104,7 @@
                     mbody: layedit.getContent(index)
                 }
                 , success: function (res) {
-                    admin.events.refresh();
-                    location.hash = '/forum/topic/thread/id=' + res.data.thid;
+                    location.hash = '/forum/topic/detail/id=' + res.data.tid;
                 }
             });
             return false;

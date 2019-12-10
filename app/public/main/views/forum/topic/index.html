@@ -3,7 +3,7 @@
 <div class="layui-card layadmin-header">
     <div class="layui-breadcrumb" lay-filter="breadcrumb">
         <a><cite>Forum</cite></a>
-        <a><cite>Topic</cite></a>
+        <a><cite>Topics</cite></a>
     </div>
 </div>
 
@@ -26,7 +26,7 @@
 <script type="text/html" id="LAY-forum-topic-list-table-oper">
     <a class="layui-btn layui-btn-xs" lay-event="more"><i
         class="layui-icon layui-icon-more"></i>MORE</a>
-  </script>
+</script>
 
 <script>
     layui.use(['admin', 'table', 'util', 'form', 'laydate'], function () {
@@ -78,7 +78,7 @@
         table.on('tool(LAY-forum-topic-list-table)', function (obj) {
             var data = obj.data;
             if (obj.event === 'more') {
-                location.hash = '/forum/topic/thread/id=' + data.tid;
+                location.hash = '/forum/topic/detail/id=' + data.tid;
             }
         });
     });

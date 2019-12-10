@@ -4,22 +4,6 @@ const Controller = require('egg').Controller;
 
 class MessageController extends Controller {
 
-    async threadList() {
-
-        const { ctx } = this;
-
-        const threadList = await ctx.service.thread.getUnreadThreadListByUid(ctx.uid);
-
-        ctx.body = {
-            "code": 0,
-            "msg": "",
-            "count": threadList.length,
-            "data": threadList
-        };
-        ctx.status = 200;
-
-    }
-
     async messageList() {
 
         const { ctx } = this;
@@ -53,21 +37,6 @@ class MessageController extends Controller {
         ctx.status = 200;
 
     }
-
-    async new() {
-        const { ctx } = this;
-        const result = await ctx.service.thread.create(ctx.uid, ctx.request.body.tid, ctx.request.body.mtitle, ctx.request.body.mbody, ctx.request.body.receiver_uids);
-
-        ctx.body = {
-            "code": 0,
-            "data": {
-                thid: ctx.thid
-            }
-        }
-        ctx.status = 200;
-
-    }
-
 }
 
 module.exports = MessageController;

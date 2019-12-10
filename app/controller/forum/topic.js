@@ -7,7 +7,7 @@ class TopicController extends Controller {
 
         const { ctx } = this;
 
-        const topicList = await ctx.service.topic.getTopicListByUid(ctx.uid);
+        const topicList = await ctx.service.topic.getTopicListByUid(ctx.uid, ctx.query.limit, ctx.query.page);
 
         ctx.body = {
             "code": 0,
@@ -15,6 +15,7 @@ class TopicController extends Controller {
             "count": topicList.length,
             "data": topicList
         };
+
         ctx.status = 200;
 
     }
@@ -26,7 +27,8 @@ class TopicController extends Controller {
         ctx.body = {
             "code": 0,
             "data": {
-                thid: ctx.thid
+                thid: ctx.thid,
+                tid: ctx.tid
             }
         };
         ctx.status = 200;

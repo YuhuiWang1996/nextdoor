@@ -88,8 +88,7 @@
                     receiver_uids: field.receiver_uids
                 }
                 , success: function (res) {
-                    admin.events.refresh();
-                    location.hash = '/forum/message/detail/id=' + res.data.thid;
+                    location.hash = '/forum/thread/detail/id=' + res.data.thid;
                 }
             });
             return false;

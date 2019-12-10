@@ -23,8 +23,8 @@
           "title": "Topic"
         },
         {
-          "name": "Message",
-          "title": "Message"
+          "name": "unread",
+          "title": "Unread"
         }
       ]
     },

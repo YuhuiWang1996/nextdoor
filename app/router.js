@@ -11,6 +11,8 @@ module.exports = app => {
   router.post('/api/register/create', controller.register.register);
   router.post('/api/login', controller.login.login);
 
+  router.get('/api/jwt/user/info', controller.home.userinfo);
+
   router.get('/api/jwt/hood/resident/list', controller.hood.resident.residentList);
   router.post('/api/jwt/hood/resident/friend/sendRequest', controller.hood.resident.sentFriendRequest);
   router.post('/api/jwt/hood/resident/neighbor/add', controller.hood.resident.addNeighbor);
@@ -27,12 +29,17 @@ module.exports = app => {
   router.post('/api/jwt/forum/topic/new/submit', controller.forum.topic.newTopic);
   router.get('/api/jwt/forum/topic/receiver', controller.forum.topic.receiverList);
   router.get('/api/jwt/forum/thread/detail', controller.forum.message.messageList);
-  router.post('/api/jwt/forum/thread/new', controller.forum.message.new);
+  router.post('/api/jwt/forum/thread/new', controller.forum.thread.new);
+  router.get('/api/jwt/forum/thread/unread', controller.forum.thread.unreadThreadList);
   router.post('/api/jwt/forum/message/reply', controller.forum.message.reply);
-  router.get('/api/jwt/forum/message/list', controller.forum.message.threadList);
-
 
   router.get('/api/jwt/relation/friend/list', controller.relation.friend.friendList);
+  router.get('/api/jwt/relation/friend/receive/list', controller.relation.friend.friendRequests);
+  router.get('/api/jwt/relation/friend/sent/list', controller.relation.friend.requestsSent);
+  router.post('/api/jwt/relation/friend/remove', controller.relation.friend.removeFriend);
+  router.post('/api/jwt/relation/friend/accept', controller.relation.friend.acceptFriendRequest);
+
+  router.get('/api/jwt/relation/neighbor/list', controller.relation.neighbor.neighborList);
 
   // router.post('/api/jwt/');
 

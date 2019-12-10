@@ -2,13 +2,9 @@
 
 const Controller = require('egg').Controller;
 
-class HomeController extends Controller {
-  async index() {
-    const { ctx } = this;
-    await ctx.render('index.html');
-  }
+class AccountController extends Controller {
+  async detail() {
 
-  async userinfo() {
     const { ctx } = this;
     const user = await ctx.service.user.detail(ctx.uid);
     ctx.body = {
@@ -16,7 +12,8 @@ class HomeController extends Controller {
       data: user[0]
     }
     ctx.status = 200;
+
   }
 }
 
-module.exports = HomeController;
+module.exports = AccountController;

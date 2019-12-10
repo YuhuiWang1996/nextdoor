@@ -54,6 +54,17 @@ class UserService extends Service {
         }
     }
 
+    async detail(uid) {
+        const { app } = this;
+        const user = await app.mysql.query(
+            'SELECT * FROM `User` LEFT JOIN ( BlockJoin NATURAL JOIN block NATURAL JOIN hood ) \
+            ON BlockJoin.uid = `User`.uid AND `status` = 1001 \
+            WHERE `User`.uid = ?', [uid]
+        )
+
+        return user;
+    }
+
 }
 
 module.exports = UserService;

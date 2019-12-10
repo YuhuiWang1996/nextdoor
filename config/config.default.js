@@ -46,7 +46,7 @@ module.exports = appInfo => {
     agent: false,
   };
 
-  // jwt
+  // jwt jsonwebtoken access_token
   config.jwt = {
     secret: secret
   };
