@@ -1,0 +1,112 @@
+<title>Profile</title>
+
+<div class="layui-card layadmin-header">
+    <div class="layui-breadcrumb" lay-filter="breadcrumb">
+        <a><cite>Account</cite></a>
+        <a><cite>Profile</cite></a>
+    </div>
+</div>
+
+<div class="layui-fluid" id="LAY-set-account-profile">
+    <div class="layui-card">
+        <div class="layui-card-body">
+            <div class="layui-form" id="LAY-set-account-profile-form" lay-filter="LAY-set-account-profile-form">
+                <script type="text/html" template lay-url="/api/jwt/setting/profile/detail"
+                    lay-done="done_set_account_profile(d);">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">First Name</label>
+                        <div class="layui-input-inline">
+                            <input type="text" name="ufirstname" lay-verify="required" placeholder="" autocomplete="off"
+                                class="layui-input" value="{{d.data.ufirstname}}">
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">Last Name</label>
+                        <div class="layui-input-inline">
+                            <input type="text" name="ulastname" lay-verify="required" placeholder="" autocomplete="off"
+                                class="layui-input" value="{{d.data.ulastname}}">
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">Email</label>
+                        <div class="layui-input-inline">
+                            <input type="text" name="uemail" lay-verify="required" placeholder="" autocomplete="off"
+                                class="layui-input" value="{{d.data.uemail}}">
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">Introduction</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="uintro" lay-verify="required" placeholder="" autocomplete="off"
+                                class="layui-input" value="{{d.data.uintro}}">
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">Hood</label>
+                        <div class="layui-input-inline">
+                            <input type="text" name="hname" placeholder="" autocomplete="off"
+                                class="layui-input" value="{{d.data.hname}}" readonly>
+                        </div>                        
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">Block</label>
+                        <div class="layui-input-inline">
+                            <input type="text" name="bname" placeholder="" autocomplete="off"
+                                class="layui-input" value="{{d.data.bname}}" readonly>
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">Address</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="uaddr_name" placeholder="" autocomplete="off"
+                                class="layui-input" value="{{d.data.uaddr_name}}" readonly>
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <div class="layui-input-block">
+                            <button class="layui-btn" lay-submit lay-filter="LAY-set-account-profile-form-submit">submit
+                            </button>
+                            <a class="layui-btn layui-btn-normal" lay-href="/set/account/block">Change Address</a>
+                        </div>
+                    </div>
+                </script>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+
+    function done_set_account_profile(d) {
+        layui.use(['form'], function () {
+            var $ = layui.$
+                , form = layui.form;
+            form.render(null, 'LAY-set-account-profile-form');
+        });
+    }
+
+    layui.use(['admin', 'table', 'util', 'form', 'upload', 'layedit'], function () {
+        var $ = layui.$
+            , admin = layui.admin
+            , form = layui.form;
+        var layedit = layui.layedit;
+        form.on('submit(LAY-set-account-profile-form-submit)', function (data) {
+            let field = data.field;
+            admin.req({
+                url: '/api/jwt/setting/profile/edit'
+                , type: 'POST'
+                , data: {
+                    ufirstname: field.ufirstname,
+                    ulastname: field.ulastname,
+                    uemail: field.uemail,
+                    uintro: field.uintro
+                }
+                , success: function (res) {
+                    admin.events.refresh();
+                }
+            });
+            return false;
+        });
+
+    });
+</script>

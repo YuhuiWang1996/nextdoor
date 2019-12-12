@@ -1,19 +1,151 @@
-<div class="layui-fluid">
+<style type="text/css">
+  #LAY-console .layui-table-cell {
+    height: auto;
+    overflow: visible;
+    text-overflow: inherit;
+    white-space: normal;
+  }
+
+  #LAY-console hr {
+    margin: 5px 0;
+  }
+</style>
+
+<div class="layui-fluid" id="LAY-console">
   <div class="layui-row layui-col-space15">
-    <div class="layui-col-md8">
-      <div class="layui-row layui-col-space15">
-        <div class="layui-col-md6">
+    <div class="layui-col-md6">
+      <div class="layui-card">
+        <div class="layui-card-header">My Block</div>
+        <div class="layui-card-body">
+          <table id="LAY-console-thread-block-table" lay-filter="LAY-console-thread-block-table"></table>
         </div>
-        <div class="layui-col-md6">
+      </div>
+      <div class="layui-card">
+          <div class="layui-card-header">My Friends</div>
+          <div class="layui-card-body">
+            <table id="LAY-console-thread-friend-table" lay-filter="LAY-console-thread-friend-table"></table>
+          </div>
         </div>
-        <div class="layui-col-md12">
+    </div>
+    <div class="layui-col-md6">
+      <div class="layui-card">
+        <div class="layui-card-header">My Hood</div>
+        <div class="layui-card-body">
+          <table id="LAY-console-thread-hood-table" lay-filter="LAY-console-thread-hood-table"></table>
         </div>
       </div>
     </div>
   </div>
 </div>
 
+<!--operation-->
+<script type="text/html" id="LAY-console-table-oper">
+  <a class="layui-btn layui-btn-xs" lay-event="more"><i
+      class="layui-icon layui-icon-more"></i>MORE</a>
+</script>
 
 <script>
+  layui.use(['admin', 'table', 'util', 'form', 'laydate'], function () {
+    var $ = layui.$
+      , admin = layui.admin
+      , table = layui.table
+      , view = layui.view
+      , form = layui.form
+      , element = layui.element;
+    var laydate = layui.laydate;
+    var router = layui.router();
 
+    var tplName = function (d) {
+      let str = '<div lay-href="/forum/thread/detail/id=' + d.thid + '"><b style="font-size:16px;color:#050505;">' + d.initialMtitle + '</b>'
+        + '<span style="float:right;font-size:12px;color:rgb(120, 124, 126);">Created ' + moment(d.initialCreateAt).fromNow() + '</span>'
+        + '<hr style="width:50%;"><span style="font-size:12px;">' + d.initialMbody + '</span>';
+      if (d.isRead == 1) {
+        str += '<span style="float:right;color:#FF5722;">unread</span>';
+      }
+      str += '</div>'
+      if (d.initialAddr) {
+        str += '<span style="float:right;font-size:12px;color:#1E9FFF;"><i class="layui-icon layui-icon-location"></i>&nbsp;' + d.initialAddr + '</span>';
+      }
+      return str;
+    };
+
+    var tplMsg = function (d) {
+      if (d.initialCreateAt != d.latestCreateAt && d.latestMtitle) {
+        let str = '<i style="font-size:14px;color:#0079d3;">' + d.latestMtitle + '</i>'
+          + '<span style="float:right;font-size:12px;color:rgb(120, 124, 126);">Posted by ' + d.ufirstname + " " + d.ulastname + " " + moment(d.latestCreateAt).fromNow() + '</span>'
+          + '<hr style="width:30%;"><span style="font-size:12px;">' + d.latestMbody + '</span>';
+        if (d.latestAddr) {
+          str += '<span style="float:right;font-size:12px;color:#1E9FFF;"><i class="layui-icon layui-icon-location"></i>&nbsp;' + d.latestAddr + '</span>';
+        }
+        return str;
+      } else {
+        return "No Reply";
+      }
+    };
+
+    let LAYThreadBlockTable = table.render({
+      elem: '#LAY-console-thread-block-table'
+      , url: '/api/jwt/console/thread/list'
+      , cols: [[
+        { field: 'initialMtitle', title: 'Threads', templet: tplName }
+        , { field: 'latestMtitle', title: 'Latest Reply', templet: tplMsg }
+      ]]
+      , limit: 5
+      , text: {
+        none: 'No Data'
+      }
+      , where: {
+        access_token: layui.data('layuiAdmin').access_token,
+        type: 'block'
+      }
+      , page: {
+        layout: ['prev', 'page', 'next']
+      }
+    });
+    let LAYThreadHoodTable = table.render({
+      elem: '#LAY-console-thread-hood-table'
+      , url: '/api/jwt/console/thread/list'
+      , cols: [[
+        { field: 'initialMtitle', title: 'Threads', templet: tplName }
+        , { field: 'latestMtitle', title: 'Latest Reply', templet: tplMsg }
+      ]]
+      , limit: 5
+      , text: {
+        none: 'No Data'
+      }
+      , where: {
+        access_token: layui.data('layuiAdmin').access_token,
+        type: 'hood'
+      }
+      , page: {
+        layout: ['prev', 'page', 'next']
+      }
+    });
+    let LAYThreadFriendTable = table.render({
+      elem: '#LAY-console-thread-friend-table'
+      , url: '/api/jwt/console/thread/list'
+      , cols: [[
+        { field: 'initialMtitle', title: 'Threads', templet: tplName }
+        , { field: 'latestMtitle', title: 'Latest Reply', templet: tplMsg }
+      ]]
+      , limit: 5
+      , text: {
+        none: 'No Data'
+      }
+      , where: {
+        access_token: layui.data('layuiAdmin').access_token,
+        type: 'friend'
+      }
+      , page: {
+        layout: ['prev', 'page', 'next']
+      }
+    });
+
+    table.on('tool(LAY-console-thread-all-table)', function (obj) {
+      var data = obj.data;
+      if (obj.event === 'more') {
+        location.hash = '/forum/thread/detail/id=' + data.thid;
+      }
+    });
+  });
 </script>

@@ -30,7 +30,6 @@
       <div class="layui-form-item" style="padding-left: 20px;">
         <input type="radio" name="gender" value="female" title="Female" checked="">
         <input type="radio" name="gender" value="male" title="Male">
-        <input type="radio" name="gender" value="other" title="Other">
       </div>
       <div class="layui-form-item">
         <input type="password" name="pwd" id="LAY-user-login-password" lay-verify="required" placeholder="Password"
@@ -41,56 +40,160 @@
           placeholder="Confirm Password" class="layui-input">
       </div>
       <div class="layui-form-item">
-        <input list="blockList" type="text" name="addr" autocomplete="off" id="LAY-user-login-addr"
-          lay-verify="required" placeholder="Join a block" class="layui-input">
-        <datalist id="blockList">
-        </datalist>
+        <input id="hname" type="text" name="hname" lay-verify="required" placeholder="Hood" autocomplete="off"
+          class="layui-input" value="" readonly>
+      </div>
+      <div class="layui-form-item">
+        <input id="bname" type="text" name="bname" lay-verify="required" placeholder="Block" autocomplete="off"
+          class="layui-input" value="" readonly>
+      </div>
+      <div class="layui-form-item">
+        <input id="uaddr_name" type="text" name="uaddr_name" lay-verify="required" placeholder="Address"
+          autocomplete="off" class="layui-input" value="" readonly>
       </div>
       <div class="layui-form-item">
         <input type="text" name="intro" autocomplete="off" id="LAY-user-login-intro" lay-verify="required"
           placeholder="Introduct yourself" class="layui-input">
       </div>
+      <input type="hidden" id="bid" name="bid">
+      <input type="hidden" id="uaddr_lat" name="uaddr_lat">
+      <input type="hidden" id="uaddr_lng" name="uaddr_lng">
       <div class="layui-form-item">
         <button class="layui-btn layui-btn-fluid" lay-submit lay-filter="LAY-user-reg-submit">CREATE ACCOUNT</button>
       </div>
     </div>
   </div>
+  <div class="layui-card" style="width: 80%;margin: 0 auto;">
+    <div class="layui-card-body" style="height: 500px;">
+      <div id="map" style="height: 100%;"></div>
+    </div>
+  </div>
 </div>
 
 <script>
-
-  $("#LAY-user-login-addr").bind("keyup", function (event) {
-    if (event.keyCode == 38 || event.keyCode == 40) {
-      return false;
-    }
-    var value = $("#LAY-user-login-addr").val();
-    info(value);
-  })
-
-  function info(value) {
-    var url = "/api/register/block/list";
-    var data = {
-      name: value
-    }
-    $.ajax({
-      url: url,
-      data: data,
-      type: "POST",
-      dataType: "JSON",
-      success: function (result) {
-        var a = result.blockList;
-        var list = "";
-        for (var i in a) {
-          var l = a[i].bname + " - " + a[i].hname;
-          list += "<option>" + l + "</option>";
-        }
-        $("#blockList").html(list);
-      },
-      error: function () {
-        console.log("error");
+  layui.use(['admin', 'form'], function () {
+    var $ = layui.$
+      , admin = layui.admin
+      , form = layui.form;
+    admin.req({
+      url: '/api/register/block/hood/list'
+      , type: 'GET'
+      , data: {}
+      , done: function (res) {
+        setHoodArea(res.data);
       }
-    })
-  }
+    });
+    admin.req({
+      url: '/api/register/block/list'
+      , type: 'GET'
+      , data: {}
+      , done: function (res) {
+        setBlockArea(res.data);
+      }
+    });
+    let map;
+    let infoWindow = new google.maps.InfoWindow();
+    let marker = null;
+    let geocoder = new google.maps.Geocoder();
+    map = new google.maps.Map(document.getElementById('map'), {
+      center: { lat: 40.694177, lng: -73.986596 },
+      zoom: 14
+    });
+
+    google.maps.event.addListener(map, 'click', function (event) {
+      layer.msg("sorry, you cannot choose this area");
+    });
+
+    function setHoodArea(hoodList) {
+      var hoodAreaList = [];
+      for (i in hoodList) {
+        var hood = hoodList[i];
+        hoodAreaList[i] = new google.maps.Rectangle({
+          bounds: {
+            north: hood.hne_lat,
+            south: hood.hsw_lat,
+            east: hood.hne_lng,
+            west: hood.hsw_lng
+          },
+          strokeColor: '#009688',
+          strokeOpacity: 0.4,
+          strokeWeight: 1,
+          fillColor: '#009688',
+          fillOpacity: 0.15,
+          map: map
+        });
+        hoodAreaList[i].hood = hood;
+        hoodAreaList[i].addListener('click', function (event) {
+          infoWindow.setContent(this.hood.hname);
+          infoWindow.setPosition(this.getBounds().getNorthEast());
+          infoWindow.open(map);
+          layer.msg("sorry, you cannot choose this area");
+        });
+      }
+    }
+
+    function setBlockArea(blockList) {
+      var blockAreaList = [];
+      for (i in blockList) {
+        var block = blockList[i];
+        blockAreaList[i] = new google.maps.Rectangle({
+          bounds: {
+            north: block.bne_lat,
+            south: block.bsw_lat,
+            east: block.bne_lng,
+            west: block.bsw_lng
+          },
+          strokeColor: '#1E9FFF',
+          strokeOpacity: 0.4,
+          strokeWeight: 1,
+          fillColor: '#1E9FFF',
+          fillOpacity: 0.15,
+          map: map
+        });
+        blockAreaList[i].block = block;
+        blockAreaList[i].addListener('click', function (event) {
+          infoWindow.setContent(this.block.hname + ' ' + this.block.bname);
+          infoWindow.setPosition(this.getBounds().getNorthEast());
+          infoWindow.open(map);
+
+          let lat = event.latLng.lat();
+          let lng = event.latLng.lng();
+
+          // remove previous Marker
+          if (marker != null) {
+            marker.setMap(null);
+          }
+          // init Marker instance
+          marker = new google.maps.Marker({
+            position: { lat: lat, lng: lng },
+            title: "Hello World!"
+          });
+          // attach Marker instance to Map instance
+          marker.setMap(map);
+
+          geocoder.geocode({
+            'latLng': event.latLng
+          }, function (results, status) {
+            if (status == google.maps.GeocoderStatus.OK) {
+              if (results[0]) {
+                document.getElementById('uaddr_name').value = results[0].formatted_address;
+              }
+            }
+          });
+
+          document.getElementById('uaddr_lat').value = lat;
+          document.getElementById('uaddr_lng').value = lng;
+          document.getElementById('bid').value = this.block.bid;
+          document.getElementById('hname').value = this.block.hname;
+          document.getElementById('bname').value = this.block.bname;
+
+        });
+      }
+    }
+
+  });
+
+
 </script>
 
 <script>
@@ -121,7 +224,7 @@
             , icon: 1
             , time: 1000
           }, function () {
-            // location.hash = '/user/login';
+            location.hash = '/user/login';
           });
         }
       });

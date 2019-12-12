@@ -6,16 +6,13 @@ class TopicController extends Controller {
     async topicList() {
 
         const { ctx } = this;
-
-        const topicList = await ctx.service.topic.getTopicListByUid(ctx.uid, ctx.query.limit, ctx.query.page);
-
+        const result = await ctx.service.topic.getTopicListByUid(ctx.uid, ctx.query.page, ctx.query.limit);
         ctx.body = {
             "code": 0,
             "msg": "",
-            "count": topicList.length,
-            "data": topicList
+            "count": result.count,
+            "data": result.topicList
         };
-
         ctx.status = 200;
 
     }
@@ -23,7 +20,8 @@ class TopicController extends Controller {
     async newTopic() {
         const { ctx } = this;
         const body = ctx.request.body;
-        const result = await ctx.service.topic.newTopic(ctx.uid, body.tsubject, body.recipient_uid, body.is_block, body.is_hood, body.is_friends, body.mtitle, body.mbody);
+        const result = await ctx.service.topic.newTopic(ctx.uid, body.tsubject, body.recipient_uid, body.is_block,
+             body.is_hood, body.is_friends, body.mtitle, body.mbody, body.mlat, body.mlng, body.maddr_name);
         ctx.body = {
             "code": 0,
             "data": {

@@ -1,0 +1,203 @@
+<title>Change Block</title>
+
+<div class="layui-card layadmin-header">
+  <div class="layui-breadcrumb" lay-filter="breadcrumb">
+    <a><cite>Account</cite></a>
+    <a><cite>Change Block</cite></a>
+  </div>
+</div>
+
+<div class="layui-fluid" id="LAY-set-account-block">
+  <div class="layui-row layui-col-space5">
+    <div class="layui-col-md7">
+      <div class="layui-card">
+        <div class="layui-card-header">
+          Please choose where you live now
+        </div>
+        <div class="layui-card-body">
+          <div class="layui-form" id="LAY-set-account-block-form" lay-filter="LAY-set-account-block-form">
+            <div class="layui-form-item">
+              <label class="layui-form-label">Hood</label>
+              <div class="layui-input-block">
+                <input id="hname" type="text" name="hname" lay-verify="required" placeholder="" autocomplete="off"
+                  class="layui-input" value="" readonly>
+              </div>
+            </div>
+            <div class="layui-form-item">
+              <label class="layui-form-label">Block</label>
+              <div class="layui-input-block">
+                <input id="bname" type="text" name="bname" lay-verify="required" placeholder="" autocomplete="off"
+                  class="layui-input" value="" readonly>
+              </div>
+            </div>
+            <div class="layui-form-item">
+              <label class="layui-form-label">Address</label>
+              <div class="layui-input-block">
+                <input id="uaddr_name" type="text" name="uaddr_name" lay-verify="required" placeholder=""
+                  autocomplete="off" class="layui-input" value="" readonly>
+              </div>
+            </div>
+
+            <input type="hidden" id="bid" name="bid">
+            <input type="hidden" id="uaddr_lat" name="uaddr_lat">
+            <input type="hidden" id="uaddr_lng" name="uaddr_lng">
+
+            <div class="layui-form-item">
+              <div class="layui-input-block">
+                <button class="layui-btn" lay-submit lay-filter="LAY-set-account-block-form-submit">submit
+                </button>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="layui-col-md5">
+      <div class="layui-card">
+        <div class="layui-card-body" style="height: 500px;">
+          <div id="map" style="height: 100%;"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  layui.use(['admin', 'form'], function () {
+    var $ = layui.$
+      , admin = layui.admin
+      , form = layui.form;
+    admin.req({
+      url: '/api/jwt/setting/block/hood/list'
+      , type: 'GET'
+      , data: {}
+      , done: function (res) {
+        setHoodArea(res.data);
+      }
+    });
+    admin.req({
+      url: '/api/jwt/setting/block/list'
+      , type: 'GET'
+      , data: {}
+      , done: function (res) {
+        setBlockArea(res.data);
+      }
+    });
+    let map;
+    let infoWindow = new google.maps.InfoWindow();
+    let marker = null;
+    let geocoder = new google.maps.Geocoder();
+    map = new google.maps.Map(document.getElementById('map'), {
+      center: { lat: 40.694177, lng: -73.986596 },
+      zoom: 14
+    });
+
+    google.maps.event.addListener(map, 'click', function (event) {
+      layer.msg("sorry, you cannot choose this area");
+    });
+
+    function setHoodArea(hoodList) {
+      var hoodAreaList = [];
+      for (i in hoodList) {
+        var hood = hoodList[i];
+        hoodAreaList[i] = new google.maps.Rectangle({
+          bounds: {
+            north: hood.hne_lat,
+            south: hood.hsw_lat,
+            east: hood.hne_lng,
+            west: hood.hsw_lng
+          },
+          strokeColor: '#009688',
+          strokeOpacity: 0.4,
+          strokeWeight: 1,
+          fillColor: '#009688',
+          fillOpacity: 0.15,
+          map: map
+        });
+        hoodAreaList[i].hood = hood;
+        hoodAreaList[i].addListener('click', function (event) {
+          infoWindow.setContent(this.hood.hname);
+          infoWindow.setPosition(this.getBounds().getNorthEast());
+          infoWindow.open(map);
+          layer.msg("sorry, you cannot choose this area");
+        });
+      }
+    }
+
+    function setBlockArea(blockList) {
+      var blockAreaList = [];
+      for (i in blockList) {
+        var block = blockList[i];
+        blockAreaList[i] = new google.maps.Rectangle({
+          bounds: {
+            north: block.bne_lat,
+            south: block.bsw_lat,
+            east: block.bne_lng,
+            west: block.bsw_lng
+          },
+          strokeColor: '#1E9FFF',
+          strokeOpacity: 0.4,
+          strokeWeight: 1,
+          fillColor: '#1E9FFF',
+          fillOpacity: 0.15,
+          map: map
+        });
+        blockAreaList[i].block = block;
+        blockAreaList[i].addListener('click', function (event) {
+          infoWindow.setContent(this.block.hname + ' ' + this.block.bname);
+          infoWindow.setPosition(this.getBounds().getNorthEast());
+          infoWindow.open(map);
+
+          let lat = event.latLng.lat();
+          let lng = event.latLng.lng();
+
+          // remove previous Marker
+          if (marker != null) {
+            marker.setMap(null);
+          }
+          // init Marker instance
+          marker = new google.maps.Marker({
+            position: { lat: lat, lng: lng },
+            title: "Hello World!"
+          });
+          // attach Marker instance to Map instance
+          marker.setMap(map);
+
+          geocoder.geocode({
+            'latLng': event.latLng
+          }, function (results, status) {
+            if (status == google.maps.GeocoderStatus.OK) {
+              if (results[0]) {
+                document.getElementById('uaddr_name').value = results[0].formatted_address;
+              }
+            }
+          });
+
+          document.getElementById('uaddr_lat').value = lat;
+          document.getElementById('uaddr_lng').value = lng;
+          document.getElementById('bid').value = this.block.bid;
+          document.getElementById('hname').value = this.block.hname;
+          document.getElementById('bname').value = this.block.bname;
+
+        });
+      }
+    }
+
+    form.on('submit(LAY-set-account-block-form-submit)', function (data) {
+      let field = data.field;
+      admin.req({
+        url: '/api/jwt/setting/block/edit'
+        , type: 'POST'
+        , data: field
+        , done: function (res) {
+          layer.msg('Change Successful!');
+        }
+      });
+      return false;
+    });
+
+  });
+
+
+</script>

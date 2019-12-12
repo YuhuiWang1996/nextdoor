@@ -1,38 +1,38 @@
-<title>Residents in My Hood</title>
+<title>Residents in My Block</title>
 
 <div class="layui-card layadmin-header">
     <div class="layui-breadcrumb" lay-filter="breadcrumb">
-        <a><cite>My Hood</cite></a>
-        <a><cite>Message</cite></a>
+        <a><cite>My Block</cite></a>
+        <a><cite>Residents</cite></a>
         <a><cite>List</cite></a>
     </div>
 </div>
 
-<div class="layui-fluid" id="LAY-hood-resident-message">
+<div class="layui-fluid" id="LAY-block-resident-list">
     <div class="layui-card">
-        <table id="LAY-hood-resident-message-table" lay-filter="LAY-hood-resident-message-table"></table>
+        <table id="LAY-block-resident-list-table" lay-filter="LAY-block-resident-list-table"></table>
     </div>
 </div>
 
 <!--operation-->
-<script type="text/html" id="LAY-hood-resident-message-table-oper">
+<script type="text/html" id="LAY-block-resident-list-table-oper">
     {{# if (d.is_friend == 0){ }}
-        {{# if (d.friendStatus == 1001) { }}
-            <a class="layui-btn layui-btn-xs" lay-event="removeFriend"><i
-                class="layui-icon layui-icon-ok"></i>Friend</a>
-        {{# } }}
-        {{# if (d.friendStatus == 1002) { }}
-            <a class="layui-btn layui-btn-xs layui-btn-warm"><i
-                class="layui-icon layui-icon-loading"></i>Friend Request Sent</a>
-        {{# } }}
-        {{# if (d.friendStatus == 1003 || d.friendStatus == 1004 ) { }}
-        <a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="friend"><i
-            class="layui-icon layui-icon-add-1"></i>Friend</a>
-        {{# } }}
+        <a class="layui-btn layui-btn-xs" lay-event="removeFriend"><i
+            class="layui-icon layui-icon-ok"></i>Friend</a>
     {{# } else { }}
-        <a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="friend"><i
+        {{# if (d.is_friend_recipient == 1 && d.is_friend_applicant == 1){ }}
+            <a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="friend"><i
             class="layui-icon layui-icon-add-1"></i>Friend</a>
+        {{# } else if (d.is_friend_recipient == 1) { }}
+        <a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="friend"><i
+            class="layui-icon layui-icon-face-smile-b"></i>Accept</a>
+        {{# } else if (d.is_friend_applicant == 1) { }}
+        <a class="layui-btn layui-btn-xs layui-btn-warm"><i
+            class="layui-icon layui-icon-loading"></i>Friend Request Sent</a>
+        {{# } }}
     {{# } }}
+    
+
     {{# if (d.is_neighbor == 1){ }}
       <a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="neighbor"><i
         class="layui-icon layui-icon-add-1"></i>Neighbor</a>
@@ -57,15 +57,12 @@
             return d.ufirstname + " " + d.ulastname;
         };
 
-        let LAYAdminAdminListTable = table.render({
-            elem: '#LAY-hood-resident-message-table'
-            , url: '/api/jwt/hood/resident/list'
-            // , toolbar: true
-            // , defaultToolbar: ['']
+        let LAYblockResidentListTable = table.render({
+            elem: '#LAY-block-resident-list-table'
+            , url: '/api/jwt/block/resident/list'
             , cols: [[
                 { field: 'uname', align: 'center', width: 160, title: 'Name', templet: tplName }
-                , { field: 'bname', title: 'Block' }
-                , { title: '', width: 300, align: 'center', toolbar: '#LAY-hood-resident-message-table-oper' }
+                , { title: '', align: 'center', toolbar: '#LAY-block-resident-list-table-oper' }
             ]]
             , limit: 10
             , limits: [10, 15, 20, 25, 30]
@@ -75,64 +72,63 @@
             , where: {
                 access_token: layui.data('layuiAdmin').access_token
             }
-            , page: getTablePageAndLimit('LAY-hood-resident-message-table')
+            , page: getTablePageAndLimit('LAY-block-resident-list-table')
             , done: function (res, curr) {
-                setTablePageAndLimit(res, curr, LAYAdminAdminListTable.config);
+                setTablePageAndLimit(res, curr, LAYblockResidentListTable.config);
 
             }
         });
 
-        table.on('tool(LAY-hood-resident-message-table)', function (obj) {
+        table.on('tool(LAY-block-resident-list-table)', function (obj) {
             var data = obj.data;
             if (obj.event === 'friend') {
                 admin.req({
-                    url: '/api/jwt/hood/resident/friend/sendRequest'
+                    url: '/api/jwt/block/resident/friend/sendRequest'
                     , type: 'POST'
                     , data: {
                         uid: data.uid,
                     }
                     , success: function (res) {
-                        layer.msg("Friend Request is sent.");
-                        table.reload('LAY-hood-resident-message-table');
+                        table.reload('LAY-block-resident-list-table');
                     }
                 });
             }
             if (obj.event === 'neighbor') {
                 admin.req({
-                    url: '/api/jwt/hood/resident/neighbor/add'
+                    url: '/api/jwt/block/resident/neighbor/add'
                     , type: 'POST'
                     , data: {
                         uid: data.uid,
                     }
                     , success: function (res) {
                         layer.msg(data.ufirstname + " " + data.ulastname + " is your neighbor now.");
-                        table.reload('LAY-hood-resident-message-table');
+                        table.reload('LAY-block-resident-list-table');
                     }
                 });
             }
             if (obj.event === 'removeFriend') {
                 admin.req({
-                    url: '/api/jwt/hood/resident/friend/remove'
+                    url: '/api/jwt/block/resident/friend/remove'
                     , type: 'POST'
                     , data: {
                         uid: data.uid,
                     }
                     , success: function (res) {
                         layer.msg(data.ufirstname + " " + data.ulastname + " is no longer your Friend.");
-                        table.reload('LAY-hood-resident-message-table');
+                        table.reload('LAY-block-resident-list-table');
                     }
                 });
             }
             if (obj.event === 'removeNeighbor') {
                 admin.req({
-                    url: '/api/jwt/hood/resident/neighbor/remove'
+                    url: '/api/jwt/block/resident/neighbor/remove'
                     , type: 'POST'
                     , data: {
                         uid: data.uid,
                     }
                     , success: function (res) {
                         layer.msg(data.ufirstname + " " + data.ulastname + " is no longer your Neighbor.");
-                        table.reload('LAY-hood-resident-message-table');
+                        table.reload('LAY-block-resident-list-table');
                     }
                 });
             }

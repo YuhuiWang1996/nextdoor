@@ -25,7 +25,7 @@ class RegisterController extends Controller {
     };
     // ctx.validate(rule);
     const body = ctx.request.body;
-    const result = await ctx.service.user.register(body.firstname, body.lastname, body.email, body.pwd, body.gender, body.intro, body.addr);
+    const result = await ctx.service.user.register(body.firstname, body.lastname, body.email, body.pwd, body.gender, body.intro, body.bid, body.uaddr_lat, body.uaddr_lng, body.uaddr_name);
     ctx.body = {
       code: 0
     };

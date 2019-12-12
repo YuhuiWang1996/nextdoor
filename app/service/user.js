@@ -7,7 +7,7 @@ const moment = require('moment');
 
 class UserService extends Service {
 
-    async register(firstname, lastname, email, pwd, gender, intro, addr) {
+    async register(firstname, lastname, email, pwd, gender, intro, bid, uaddr_lat, uaddr_lng, uaddr_name) {
         const { ctx, app } = this;
         const result = await app.mysql.beginTransactionScope(async conn => {
             const user = await conn.insert('User',
@@ -18,16 +18,15 @@ class UserService extends Service {
                     upwd: md5(pwd),
                     ugender: gender,
                     uintro: intro,
-                    createAt: moment().format('YYYY-MM-DD HH:mm:ss')
+                    uaddr_lat: uaddr_lat,
+                    uaddr_lng: uaddr_lng,
+                    uaddr_name: uaddr_name,
+                    registerAt: moment().format('YYYY-MM-DD HH:mm:ss')
                 });
 
-            const addrs = addr.split(' - ');
-            const bname = addrs[0];
-            const hname = addrs[1];
-            const block = await conn.query('SELECT bid FROM block NATURAL JOIN hood \
-                                            WHERE hname = ? AND bname = ?', [hname, bname]);
+
             await conn.insert('BlockJoin', {
-                bid: block[0].bid,
+                bid: bid,
                 uid: user.insertId,
                 applyAt: moment().format('YYYY-MM-DD HH:mm:ss'),
                 status: 1002 // pending
@@ -62,7 +61,84 @@ class UserService extends Service {
             WHERE `User`.uid = ?', [uid]
         )
 
+        user[0].uaddr_name = user[0].uaddr_name.toString('utf8');
+
         return user;
+    }
+
+    async changeInfo(uid, ufirstname, ulastname, uemail, uintro) {
+        const { app } = this;
+        const result = await app.mysql.update('User', {
+            ufirstname: ufirstname,
+            ulastname: ulastname,
+            uemail: uemail,
+            uintro: uintro
+        }, {
+            where: {
+                uid: uid
+            }
+        });
+        return result;
+    }
+
+    async changePassword(uid, upwd, newpwd) {
+        const { app } = this;
+        const user = await app.mysql.get('User', {
+            uid: uid,
+            upwd: md5(upwd)
+        })
+        if (user) {
+            await app.mysql.update('User', {
+                upwd: md5(newpwd)
+            }, {
+                where: {
+                    uid: uid
+                }
+            })
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    async changeBlock(uid, bid, uaddr_lat, uaddr_lng, uaddr_name) {
+        const { app } = this;
+        await app.mysql.update('BlockJoin', {
+            status: 1003 // leave
+        }, {
+            where: { uid: uid }
+        });
+
+        await app.mysql.update('User', {
+            uaddr_lat: uaddr_lat,
+            uaddr_lng: uaddr_lng,
+            uaddr_name: uaddr_name
+        }, {
+            where: { uid: uid }
+        })
+
+        const bj = await app.mysql.get('BlockJoin', {
+            uid: uid,
+            bid: bid
+        });
+        if (bj) {
+            await app.mysql.update('BlockJoin', {
+                applyAt: moment().format('YYYY-MM-DD HH:mm:ss'),
+                status: 1002 // pending
+            }, {
+                where: {
+                    uid: uid,
+                    bid: bid
+                }
+            });
+        } else {
+            await app.mysql.insert('BlockJoin', {
+                bid: bid,
+                uid: uid,
+                applyAt: moment().format('YYYY-MM-DD HH:mm:ss'),
+                status: 1002 // pending
+            });
+        }
     }
 
 }

@@ -106,7 +106,7 @@ layui.define(['laytpl', 'layer'], function(exports){
         //其它异常
         else {
           var error = [
-            '<cite>Error：</cite> ' + (res[response.msgName] || '返回状态码异常')
+            (res[response.msgName] || '返回状态码异常')
             ,debug()
           ].join('');
           view.error(error);

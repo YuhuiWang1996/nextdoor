@@ -53,10 +53,15 @@
             let res = '<b style="font-size:16px;color:#050505;">' + d.mtitle + '</b>'
                 + '<span style="float:right;font-size:12px;color:rgb(120, 124, 126);">Posted by ' + d.ufirstname + " " + d.ulastname + " " + moment(d.createAt).fromNow() + '</span>'
                 + '<hr style="width:50%;"><span style="font-size:12px;">' + d.mbody + '</span>';
+
             if (d.LAY_INDEX == 1) {
                 res = '<b style="font-size:16px;color:#050505;">' + d.mtitle + '</b><i style="margin-left:10px;">Initial Message</i>'
                     + '<span style="float:right;font-size:12px;color:rgb(120, 124, 126);">Posted by ' + d.ufirstname + " " + d.ulastname + " " + moment(d.createAt).fromNow() + '</span>'
                     + '<hr style="width:50%;"><span style="font-size:12px;">' + d.mbody + '</span>';
+            }
+
+            if (d.maddr_name) {
+                res += '<span style="float:right;font-size:12px;color:#1E9FFF;"><i class="layui-icon layui-icon-location"></i>&nbsp;' + d.maddr_name + '</span>';
             }
 
             return res;
@@ -70,7 +75,9 @@
             ]]
             , limit: 10
             , limits: [10, 15, 20, 25, 30]
-            , text: 'Ops...'
+            , text: {
+                none: 'No Data'
+            }
             , where: {
                 thid: router.search.id,
                 access_token: layui.data('layuiAdmin').access_token

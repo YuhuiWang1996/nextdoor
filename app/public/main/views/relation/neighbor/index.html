@@ -1,0 +1,146 @@
+<title>Neighbors</title>
+
+<div class="layui-card layadmin-header">
+    <div class="layui-breadcrumb" lay-filter="breadcrumb">
+        <a><cite>Relationships</cite></a>
+        <a><cite>Neighbors</cite></a>
+    </div>
+</div>
+
+<div class="layui-fluid" id="LAY-relation-neighbor-list">
+    <div class="layui-row layui-col-space5">
+        <div class="layui-col-xs12 layui-col-sm12 layui-col-md12 layui-col-lg12">
+            <div class="layui-card">
+                <div class="layui-card-body">
+                    <table id="LAY-relation-neighbor-list-table" lay-filter="LAY-relation-neighbor-list-table"></table>
+                </div>
+            </div>
+        </div>
+        <div class="layui-col-xs12 layui-col-sm12 layui-col-md12 layui-col-lg12">
+            <div class="layui-card">
+                <div class="layui-card-header">
+                    People You May Know
+                </div>
+                <div class="layui-card-body">
+                    <table id="LAY-relation-neighbor-potential-list-table"
+                        lay-filter="LAY-relation-neighbor-potential-list-table"></table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--operation-->
+<script type="text/html" id="LAY-relation-neighbor-list-table-oper">
+    <a class="layui-btn layui-btn-warm layui-btn-xs" lay-event="remove"><i
+        class="layui-icon layui-icon-close"></i>remove</a>
+</script>
+
+<script type="text/html" id="LAY-relation-neighbor-potential-list-table-oper">
+    <a class="layui-btn layui-btn-xs" lay-event="add"><i
+        class="layui-icon layui-icon-add-1"></i>add</a>
+</script>
+
+<script>
+    layui.use(['admin', 'table', 'util', 'form', 'laydate'], function () {
+        var $ = layui.$
+            , admin = layui.admin
+            , table = layui.table
+            , view = layui.view
+            , form = layui.form
+            , element = layui.element;
+        var laydate = layui.laydate;
+        var router = layui.router();
+
+        var tplName = function (d) {
+            let str = d.ufirstname + " " + d.ulastname;
+            return str;
+        };
+
+        var tplNameP = function (d) {
+            let str = d.ufirstname + " " + d.ulastname;
+            if (d.is_sameBlock == 1) {
+                str += '<i style="float: right; color:#787C7E;">Same Block</i>';
+            } else {
+                str += '<i style="float: right; color:#787C7E;">Same Hood</i>';
+            }
+            return str;
+        };
+
+        let LAYRelationNeighborListTable = table.render({
+            elem: '#LAY-relation-neighbor-list-table'
+            , url: '/api/jwt/relation/neighbor/list'
+            , cols: [[
+                { field: 'uname', title: 'Name', templet: tplName }
+                , { title: '', width: 150, align: 'center', toolbar: '#LAY-relation-neighbor-list-table-oper' }
+            ]]
+            , limit: 10
+            , limits: [10, 15, 20, 25, 30]
+            , text: {
+                none: 'No Data'
+            }
+            , where: {
+                access_token: layui.data('layuiAdmin').access_token
+            }
+            , page: getTablePageAndLimit('LAY-relation-neighbor-list-table')
+            , done: function (res, curr) {
+                setTablePageAndLimit(res, curr, LAYRelationNeighborListTable.config);
+            }
+        });
+
+        let LAYRelationPotentialNeighborListTable = table.render({
+            elem: '#LAY-relation-neighbor-potential-list-table'
+            , url: '/api/jwt/relation/neighbor/potential/list'
+            , cols: [[
+                { field: 'uname', title: 'Name', templet: tplNameP }
+                , { title: '', width: 150, align: 'center', toolbar: '#LAY-relation-neighbor-potential-list-table-oper' }
+            ]]
+            , limit: 10
+            , limits: [10, 15, 20, 25, 30]
+            , text: {
+                none: 'No Data'
+            }
+            , where: {
+                access_token: layui.data('layuiAdmin').access_token
+            }
+            , page: getTablePageAndLimit('LAY-relation-neighbor-potential-list-table')
+            , done: function (res, curr) {
+                setTablePageAndLimit(res, curr, LAYRelationPotentialNeighborListTable.config);
+            }
+        });
+
+        table.on('tool(LAY-relation-neighbor-list-table)', function (obj) {
+            var data = obj.data;
+            if (obj.event === 'remove') {
+                console.log(data);
+                admin.req({
+                    url: '/api/jwt/relation/neighbor/remove'
+                    , type: 'POST'
+                    , data: {
+                        recipient_uid: data.uid
+                    }
+                    , success: function (res) {
+                        admin.events.refresh();
+                    }
+                });
+            }
+        });
+
+        table.on('tool(LAY-relation-neighbor-potential-list-table)', function (obj) {
+            var data = obj.data;
+            if (obj.event === 'add') {
+                console.log(data);
+                admin.req({
+                    url: '/api/jwt/relation/neighbor/add'
+                    , type: 'POST'
+                    , data: {
+                        recipient_uid: data.uid
+                    }
+                    , success: function (res) {
+                        admin.events.refresh();
+                    }
+                });
+            }
+        });
+    });
+</script>

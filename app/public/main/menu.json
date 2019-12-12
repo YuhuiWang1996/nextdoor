@@ -10,13 +10,17 @@
         {
           "title": "Console",
           "jump": "/"
+        }, 
+        {
+          "name" : "search",
+          "title": "Search"
         }
       ]
     },
     {
       "name": "forum",
       "title": "Forum",
-      "icon": "layui-icon-component",
+      "icon": "layui-icon-group",
       "list": [
         {
           "name": "topic",
@@ -24,7 +28,7 @@
         },
         {
           "name": "unread",
-          "title": "Unread"
+          "title": "Unread Threads"
         }
       ]
     },
@@ -34,10 +38,6 @@
       "icon": "layui-icon-component",
       "list": [
         {
-          "name": "news",
-          "title": "News"
-        },
-        {
           "name": "resident",
           "title": "Resident"
         }
@@ -46,12 +46,8 @@
     {
       "name": "block",
       "title": "My Block",
-      "icon": "layui-icon-component",
+      "icon": "layui-icon-location",
       "list": [
-        {
-          "name": "news",
-          "title": "News"
-        },
         {
           "name": "newResident",
           "title": "New Resident"
@@ -65,7 +61,7 @@
     {
       "name": "relation",
       "title": "Relationships",
-      "icon": "layui-icon-component",
+      "icon": "layui-icon-friends",
       "list": [
         {
           "name": "friend",
@@ -83,22 +79,22 @@
       "icon": "layui-icon-set",
       "list": [
         {
-          "name": "subscribe",
-          "title": "Subscribe",
+          "name": "account",
+          "title": "My Account",
           "list": [
             {
-              "name": "topic",
-              "title": "Topic"
+              "name": "profile",
+              "title": "Profile"
             },
             {
-              "name": "thread",
-              "title": "Thread"
+              "name": "password",
+              "title": "Change Password"
+            },
+            {
+              "name": "block",
+              "title": "Change Address"
             }
           ]
-        }, 
-        {
-          "name": "account",
-          "title": "My Account"
         }
       ]
     }

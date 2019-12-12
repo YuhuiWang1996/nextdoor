@@ -29,7 +29,8 @@ class MessageController extends Controller {
     async reply() {
 
         const { ctx } = this;
-        const result = await ctx.service.message.replyMessage(ctx.request.body.thid, ctx.uid, ctx.request.body.mtitle, ctx.request.body.mbody);
+        const body = ctx.request.body;
+        const result = await ctx.service.message.replyMessage(body.thid, ctx.uid, body.mtitle, body.mbody, body.mlat, body.mlng, body.maddr_name);
 
         ctx.body = {
             "code": 0

@@ -72,6 +72,26 @@ class FriendService extends Service {
         return friendRequests;
     }
 
+    async getPotentialFriendListByUid(uid) {
+        const {app} = this;
+        const friendList = await app.mysql.query(
+            '	SELECT bname, bid, mybid, ufirstname, ulastname, uid, \
+            ISNULL( F1.recipient_uid && F2.applicant_uid) AS is_friend, \
+            ISNULL( F1.recipient_uid ) AS is_friend_recipient, \
+            ISNULL( F2.applicant_uid ) AS is_friend_applicant, \
+            bid = mybid AS is_sameBlock \
+            FROM( SELECT bid, mybid, bname, ufirstname, ulastname, uid \
+                      FROM Block NATURAL JOIN hood NATURAL JOIN BlockJoin NATURAL JOIN `User` \
+                        NATURAL JOIN ( SELECT hid, bid AS mybid FROM BlockJoin NATURAL JOIN block NATURAL JOIN `User` WHERE uid = ? AND `status` = 1001) AS myHood \
+                        WHERE `status` = 1001 AND uid <> ? ) AS T \
+            LEFT JOIN Friend AS F1 ON F1.applicant_uid = ? AND T.uid = F1.recipient_uid \
+            LEFT JOIN Friend AS F2 ON F2.recipient_uid = ? AND T.uid = F2.applicant_uid \
+            WHERE ISNULL( F1.recipient_uid ) = 1 AND ISNULL( F2.applicant_uid ) = 1', [uid, uid, uid, uid]
+        )
+
+        return friendList;
+    }
+
 }
 
 module.exports = FriendService;

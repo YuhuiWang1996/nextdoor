@@ -4,7 +4,7 @@ const Service = require('egg').Service;
 const moment = require('moment');
 
 class TopicService extends Service {
-  async getTopicListByUid(uid, limit, page) {
+  async getTopicListByUid(uid, page, limit) {
 
     const { app } = this;
 
@@ -16,14 +16,36 @@ class TopicService extends Service {
       LEFT JOIN ( SELECT uid AS myTopicUid FROM `User` WHERE uid = ? ) AS TU ON TU.myTopicUid = topic.uid\
       LEFT JOIN ( SELECT T1.uid AS friend_uid FROM ( SELECT F1.recipient_uid AS uid FROM Friend AS F1 WHERE F1.applicant_uid = ? ) AS T1 INNER JOIN\
 	( SELECT F2.applicant_uid AS uid FROM Friend AS F2 WHERE F2.recipient_uid = ? ) AS T2 ON T1.uid = T2.uid ) AS F ON F.friend_uid = topic.uid AND topic.recipient_isFriends = 1\
+      LEFT JOIN ( SELECT tid AS ttid,ufirstname AS msg_uf, ulastname as msg_ul, mtitle, mbody,mlat, mlng, maddr_name, createAt AS msg_createAt FROM Message NATURAL JOIN `User` JOIN \
+      ( SELECT tid, max( M.createAt ) AS latestCreateAt FROM thread AS T NATURAL JOIN message AS M JOIN PermissionThread AS PT ON PT.thid = T.thid AND PT.uid = ? GROUP BY tid \
+      ) AS TM ON TM.latestCreateAt = Message.createAt ) as M on M.ttid = topic.tid \
+      LEFT JOIN `User` ON Topic.uid = `User`.uid\
+      WHERE bid IS NOT NULL OR hid IS NOT NULL OR myUid IS NOT NULL OR myTopicUid IS NOT NULL OR friend_uid IS NOT NULL ORDER BY msg_createAt DESC\
+      LIMIT ? OFFSET ?', [uid, uid, uid, uid, uid, uid, parseInt(limit), (page - 1) * limit]);
+
+    const count = await app.mysql.query(
+      'SELECT count(*) AS cnt FROM topic\
+      LEFT JOIN (SELECT bid, bname, hid, hname FROM Hood NATURAL JOIN Block NATURAL JOIN BlockJoin AS BJ WHERE BJ.uid = ? AND BJ.`status` = 1001 ) AS HB ON topic.recipient_bid = HB.bid OR topic.recipient_hid = HB.hid\
+      LEFT JOIN ( SELECT uid AS myUid FROM `User` WHERE uid = ? ) AS U ON U.myUid = topic.recipient_uid\
+      LEFT JOIN ( SELECT uid AS myTopicUid FROM `User` WHERE uid = ? ) AS TU ON TU.myTopicUid = topic.uid\
+      LEFT JOIN ( SELECT T1.uid AS friend_uid FROM ( SELECT F1.recipient_uid AS uid FROM Friend AS F1 WHERE F1.applicant_uid = ? ) AS T1 INNER JOIN\
+	( SELECT F2.applicant_uid AS uid FROM Friend AS F2 WHERE F2.recipient_uid = ? ) AS T2 ON T1.uid = T2.uid ) AS F ON F.friend_uid = topic.uid AND topic.recipient_isFriends = 1\
       LEFT JOIN ( SELECT tid AS ttid,ufirstname AS msg_uf, ulastname as msg_ul, mtitle, mbody, createAt AS msg_createAt FROM Message NATURAL JOIN `User` JOIN \
       ( SELECT tid, max( M.createAt ) AS latestCreateAt FROM thread AS T NATURAL JOIN message AS M JOIN PermissionThread AS PT ON PT.thid = T.thid AND PT.uid = ? GROUP BY tid \
       ) AS TM ON TM.latestCreateAt = Message.createAt ) as M on M.ttid = topic.tid \
       LEFT JOIN `User` ON Topic.uid = `User`.uid\
       WHERE bid IS NOT NULL OR hid IS NOT NULL OR myUid IS NOT NULL OR myTopicUid IS NOT NULL OR friend_uid IS NOT NULL', [uid, uid, uid, uid, uid, uid]);
 
+    for (let topic of topicList) {
+      if (topic.maddr_name) {
+        topic.maddr_name = topic.maddr_name.toString('utf-8').split(',')[0];
+      }
+    }
 
-    return topicList;
+    return {
+      count: count[0].cnt,
+      topicList: topicList
+    };
 
   }
 
@@ -35,7 +57,7 @@ class TopicService extends Service {
       'SELECT\
         ThreadLatestMsg.thid, M2.uid AS postBy, U.ufirstname, U.ulastname, U2.ufirstname AS u2fn, U2.ulastname AS u2ln, ReadThread.readAt, ThreadLatestMsg.latestCreateAt, ThreadLatestMsg.initialCreateAt,\
         M1.mid AS latestMid, M1.mtitle AS latestMtitle, M1.mbody AS latestMbody, M2.mid AS initialMid, M2.mtitle AS initialMtitle, M2.mbody AS initialMbody,\
-        T.tid, T.tsubject \
+        T.tid, T.tsubject, (readAt IS NULL OR latestCreateAt > readAt) AS isRead, M1.maddr_name AS latestAddr, M2.maddr_name AS initialAddr \
       FROM\
         ( SELECT PermissionThread.thid, MAX( createAt ) AS latestCreateAt, min( createAt ) AS initialCreateAt FROM\
         PermissionThread LEFT JOIN Message ON PermissionThread.thid = Message.thid WHERE PermissionThread.uid = ? GROUP BY PermissionThread.thid ) AS ThreadLatestMsg\
@@ -48,6 +70,15 @@ class TopicService extends Service {
 	      LEFT JOIN `User` AS U2 ON U2.uid = M1.uid \
       WHERE T.tid = ?', [uid, uid, tid]
     )
+
+    for (let thread of threadList) {
+      if (thread.initialAddr) {
+        thread.initialAddr = thread.initialAddr.toString('utf-8').split(',')[0];
+      }
+      if (thread.latestAddr) {
+        thread.latestAddr = thread.latestAddr.toString('utf-8').split(',')[0];
+      }
+    }
 
     return threadList;
 
@@ -76,7 +107,7 @@ class TopicService extends Service {
 
   }
 
-  async newTopic(uid, tsubject, recipient_uid, is_block, is_hood, is_friends, mtitle, mbody) {
+  async newTopic(uid, tsubject, recipient_uid, is_block, is_hood, is_friends, mtitle, mbody, mlat, mlng, maddr_name) {
 
     const { ctx, app } = this;
 
@@ -158,6 +189,9 @@ class TopicService extends Service {
         uid: uid,
         mtitle: mtitle,
         mbody: mbody,
+        mlat: mlat ? mlat : null,
+        mlng: mlng ? mlng : null,
+        maddr_name: maddr_name ? maddr_name : null,
         createAt: moment().format('YYYY-MM-DD HH:mm:ss')
       })
 

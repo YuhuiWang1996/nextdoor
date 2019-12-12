@@ -2,10 +2,10 @@
 
 const Controller = require('egg').Controller;
 
-class HoodController extends Controller {
+class ResidentController extends Controller {
     async residentList() {
         const { ctx } = this;
-        const residentList = await ctx.service.hood.getAllResidentsByUid(ctx.uid);
+        const residentList = await ctx.service.block.getAllResidentsByUid(ctx.uid);
         ctx.body = {
             "code": 0,
             "msg": "",
@@ -14,6 +14,7 @@ class HoodController extends Controller {
         };
         ctx.status = 200;
     }
+
     async sentFriendRequest() {
         const { ctx } = this;
         const result = await ctx.service.friend.friendRequest(ctx.uid, ctx.request.body.uid);
@@ -48,4 +49,4 @@ class HoodController extends Controller {
     }
 }
 
-module.exports = HoodController;
+module.exports = ResidentController;

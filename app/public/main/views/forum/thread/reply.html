@@ -12,8 +12,8 @@
 </div>
 
 <div class="layui-fluid" id="LAY-forum-message-reply">
-  <div class="layui-row layui-col-space5">
-    <div class="layui-col-xs12 layui-col-sm12 layui-col-md12">
+  <div class="layui-row layui-col-space15">
+    <div class="layui-col-md7">
       <div class="layui-card">
         <div class="layui-card-body">
           <div class="layui-form" id="LAY-forum-message-reply-tool-form" lay-filter="LAY-forum-message-reply-tool-form">
@@ -31,6 +31,17 @@
               </div>
             </div>
             <div class="layui-form-item">
+              <label class="layui-form-label">Address</label>
+              <div class="layui-input-block">
+                <input type="text" id="maddr_name" name="maddr_name" lay-verify="" placeholder="" autocomplete="off"
+                  class="layui-input" value="" readonly>
+              </div>
+            </div>
+
+            <input type="hidden" id="mlat" name="mlat">
+            <input type="hidden" id="mlng" name="mlng">
+
+            <div class="layui-form-item">
               <div class="layui-input-block">
                 <button class="layui-btn" lay-submit lay-filter="LAY-forum-message-reply-form-submit">submit
                 </button>
@@ -40,8 +51,60 @@
         </div>
       </div>
     </div>
+    <div class="layui-col-md5">
+      <div class="layui-card">
+        <div class="layui-card-body" style="height: 500px;">
+          <div id="map" style="height: 100%;"></div>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
+
+<script>
+  layui.use(['admin', 'form'], function () {
+    var $ = layui.$
+      , admin = layui.admin
+      , form = layui.form;
+    let map;
+    let infoWindow = new google.maps.InfoWindow();
+    let marker = null;
+    let geocoder = new google.maps.Geocoder();
+    map = new google.maps.Map(document.getElementById('map'), {
+      center: { lat: 40.694177, lng: -73.986596 },
+      zoom: 14
+    });
+
+    google.maps.event.addListener(map, 'click', function (event) {
+      let lat = event.latLng.lat();
+      let lng = event.latLng.lng();
+
+      // remove previous Marker
+      if (marker != null) {
+        marker.setMap(null);
+      }
+      // init Marker instance
+      marker = new google.maps.Marker({
+        position: { lat: lat, lng: lng },
+        title: "Hello World!"
+      });
+      // attach Marker instance to Map instance
+      marker.setMap(map);
+
+      geocoder.geocode({
+        'latLng': event.latLng
+      }, function (results, status) {
+        if (status == google.maps.GeocoderStatus.OK) {
+          if (results[0]) {
+            document.getElementById('maddr_name').value = results[0].formatted_address;
+          }
+        }
+      });
+      document.getElementById('mlat').value = lat;
+      document.getElementById('mlng').value = lng;
+    });
+  });
+</script>
 
 <script>
   layui.use(['admin', 'table', 'util', 'form', 'upload', 'layedit'], function () {

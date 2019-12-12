@@ -22,7 +22,8 @@
 
 <div class="layui-fluid" id="LAY-forum-topic-thread-unread-list">
     <div class="layui-card">
-        <table id="LAY-forum-topic-thread-unread-list-table" lay-filter="LAY-forum-topic-thread-unread-list-table"></table>
+        <table id="LAY-forum-topic-thread-unread-list-table" lay-filter="LAY-forum-topic-thread-unread-list-table">
+        </table>
     </div>
 </div>
 
@@ -45,14 +46,14 @@
 
         var tplName = function (d) {
             return '<b style="font-size:16px;color:#050505;">' + d.initialMtitle + '</b>'
-                + '<span style="float:right;font-size:12px;color:rgb(120, 124, 126);">Posted by ' + d.ufirstname + " " + d.ulastname + " " + moment(d.initialCreateAt).fromNow() + '</span>'
+                + '<span style="float:right;font-size:12px;color:rgb(120, 124, 126);">Created ' + moment(d.initialCreateAt).fromNow() + '</span>'
                 + '<hr style="width:50%;"><span style="font-size:12px;">' + d.initialMbody + '</span>'
         };
 
         var tplMsg = function (d) {
             if (d.initialCreateAt != d.latestCreateAt && d.latestMtitle) {
                 return '<i style="font-size:14px;color:#0079d3;">' + d.latestMtitle + '</i>'
-                    + '<span style="float:right;font-size:12px;color:rgb(120, 124, 126);">Posted ' + d.u2fn + " " + d.u2ln + " " + moment(d.latestCreateAt).fromNow() + '</span>'
+                    + '<span style="float:right;font-size:12px;color:rgb(120, 124, 126);">Posted by ' + d.ufirstname + " " + d.ulastname + " " + moment(d.latestCreateAt).fromNow() + '</span>'
                     + '<hr style="width:30%;"><span style="font-size:12px;">' + d.latestMbody + '</span>';
             } else {
                 return "No Reply";
@@ -69,12 +70,16 @@
             ]]
             , limit: 10
             , limits: [10, 15, 20, 25, 30]
-            , text: 'Ops...'
+            , text: {
+                none: 'No Data'
+            }
             , where: {
                 tid: router.search.id,
                 access_token: layui.data('layuiAdmin').access_token
             }
-            , page: getTablePageAndLimit('LAY-forum-topic-thread-unread-list-table')
+            , page: Object.assign(getTablePageAndLimit('LAY-forum-topic-thread-unread-list-table'), {
+                layout: ['prev', 'page', 'next']
+            })
             , done: function (res, curr) {
                 setTablePageAndLimit(res, curr, LAYForumTopicListTable.config);
             }

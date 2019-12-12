@@ -60,6 +60,18 @@ class FriendController extends Controller {
         }
         ctx.status = 200;
     }
+
+    async potentialFriendList() {
+        const { ctx } = this;
+        const friendList = await ctx.service.friend.getPotentialFriendListByUid(ctx.uid);
+        ctx.body = {
+            "code": 0,
+            "msg": "",
+            "count": friendList.length,
+            "data": friendList
+        };
+        ctx.status = 200;
+    }
 }
 
 module.exports = FriendController;
